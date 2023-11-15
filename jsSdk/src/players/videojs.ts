@@ -3,7 +3,8 @@ import { BasePlayerStrategy } from '../core/basePlayerStrategy';
 import { WithTelemetry } from '../telementry/decorators';
 
 export class VideoJsStrategy extends BasePlayerStrategy {
-  // eslint-disable-next-line
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   private videoPlayer!: videojs.Player;
 
   @WithTelemetry
