@@ -1,0 +1,24 @@
+# Dependency directories
+node_modules/
+
+# Environment files
+.env
+
+# Build outputs
+/dist
+/build
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

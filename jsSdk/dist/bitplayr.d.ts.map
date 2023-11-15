@@ -1,0 +1,1 @@
+{"version":3,"file":"bitplayr.d.ts","sourceRoot":"","sources":["../src/bitplayr.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,MAAM,mBAAmB,CAAC;AAM3C,OAAO,EAAE,YAAY,EAAE,MAAM,6BAA6B,CAAC;AAE3D,qBAAa,eAAe;IAC1B,MAAM,CAAC,YAAY,CAAC,MAAM,EAAE,YAAY,GAAG,MAAM;IAYjD,OAAO,CAAC,MAAM,CAAC,WAAW;CAY3B"}
