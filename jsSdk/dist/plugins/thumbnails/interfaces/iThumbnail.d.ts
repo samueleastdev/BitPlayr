@@ -1,1 +1,0 @@
-//# sourceMappingURL=iThumbnail.d.ts.map

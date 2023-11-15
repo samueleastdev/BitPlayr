@@ -1,1 +1,0 @@
-{"version":3,"file":"eThumbnail.d.ts","sourceRoot":"","sources":["../../../src/plugins/thumbnails/eThumbnail.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,MAAM,uBAAuB,CAAC;AAC/C,OAAO,EAAE,aAAa,EAAE,MAAM,sBAAsB,CAAC;AAErD,qBAAa,eAAgB,YAAW,aAAa;IACnD,KAAK,CAAC,MAAM,EAAE,MAAM;IAIpB,gBAAgB,CAAC,WAAW,EAAE,MAAM;CAIrC"}
