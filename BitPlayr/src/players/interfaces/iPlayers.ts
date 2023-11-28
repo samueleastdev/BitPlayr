@@ -10,7 +10,7 @@ export interface IPlayerStrategy {
   onTimeUpdate(callback: (event: TimeUpdateEvent) => void): void;
   onSeeked(callback: (time: number) => void): void;
   onManifestAvailable(callback: (data: any) => void): void;
-  onLoadedMetadata(callback: (time: number) => void): void;
+  onLoadedMetadata(callback: (event: Event) => void): void;
   seekTo(time: number): void;
   fullscreen(): void;
   play(): void;

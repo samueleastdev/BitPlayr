@@ -27,9 +27,9 @@ export abstract class BasePlayerStrategy implements IPlayerStrategy {
     });
   }
 
-  onLoadedMetadata(callback: (time: number) => void): void {
-    this.videoElement.addEventListener('loadedmetadata', () => {
-      callback(this.videoElement.currentTime);
+  onLoadedMetadata(callback: (event: Event) => void): void {
+    this.videoElement.addEventListener('loadedmetadata', (event) => {
+      callback(event);
     });
   }
 

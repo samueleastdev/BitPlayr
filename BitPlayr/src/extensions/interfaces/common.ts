@@ -23,5 +23,4 @@ export interface IGlobalConfig {
   extensions: IPlayerExtension[];
   deviceCapabilities: any;
   sdkConfig: ISdkConfig;
-  playerConfig: IPlayerConfig;
 }

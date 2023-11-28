@@ -3,16 +3,13 @@
   https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd
   https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
 */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { BitPlayr, ThumbnailExtension, MediatailorExtension, BasicCapabilites, BasicService, MediatailorService } from 'bitplayr';
+import { BitPlayr, ThumbnailExtension, MediatailorExtension, BasicCapabilites, BasicService, MediatailorService, LogLevel } from 'bitplayr';
 import { VProvider } from 'bitplayr/dist/extensions/interfaces/common';
-import { LogLevel } from 'bitplayr/dist/logger/logger';
 
 
 interface IPlayer {
-  currentTime: number,
-  duration: number,
   initialize(vp: VProvider): unknown;
   on(arg0: string, arg1: (event: any) => void): unknown;
   play: () => void;
@@ -25,6 +22,7 @@ function App() {
   const videoElementId = 'video-element--sam';
   const bitPlayrRef = useRef<IPlayer | null>(null);
   const progressBarRef = useRef(null);
+  const [isAdPlaying, setIsAdPlaying] = useState(false);
 
   useEffect(() => {
     const initializePlayer = async () => {
@@ -81,9 +79,6 @@ function App() {
         bitPlayrRef.current.initialize(vp);
 
         bitPlayrRef.current.on('timeupdate', (event) => {
-          //console.log('bitPlayrRef.current', bitPlayrRef.current.playerStrategy.videoElement.currentTime);
-          bitPlayrRef.current!.currentTime = event.currentTime;
-          bitPlayrRef.current!.duration = event.duration;
           const percentage = (event.currentTime / event.duration) * 100;
           progressBar!.style.width = `${percentage}%`;
         });
@@ -93,6 +88,18 @@ function App() {
         });
 
         bitPlayrRef.current.on('manifestAvailable', (event) => {
+          
+        });
+
+        bitPlayrRef.current.on('adBreakData', (adBreakData) => {
+          console.log('Ad Break Data:', adBreakData);
+        });
+
+        bitPlayrRef.current.on('adIsPlaying', (data) => {
+          setIsAdPlaying(data.isPlaying);
+          if(data.isPlaying){
+            console.log('adIsPlaying:', data);
+          }
           
         });
 
@@ -137,13 +144,19 @@ function App() {
   function restart(){
     if(bitPlayrRef.current){
       bitPlayrRef.current.seekTo(0);
+      bitPlayrRef.current.play().then(() => {
+        console.log('Playback started successfully');
+      })
+      .catch((error) => {
+        console.error('Error trying to play the media:', error);
+      });
     }
   }
 
   function progress(e){
     if (bitPlayrRef.current && progressBarRef.current) {
       const rect = progressBarRef.current.getBoundingClientRect();
-      const newTime = ((e.clientX - rect.left) / rect.width) * bitPlayrRef.current.duration; 
+      const newTime = ((e.clientX - rect.left) / rect.width) * bitPlayrRef.current!.playerStrategy.videoElement.duration; 
       bitPlayrRef.current.seekTo(newTime); 
     }
   }
@@ -157,7 +170,7 @@ function App() {
   function handleDragging(e) {
     if (bitPlayrRef.current && progressBarRef.current) {
       const rect = progressBarRef.current.getBoundingClientRect();
-      const newTime = ((e.clientX - rect.left) / rect.width) * bitPlayrRef.current.duration;
+      const newTime = ((e.clientX - rect.left) / rect.width) * bitPlayrRef.current!.playerStrategy.videoElement.duration;
       bitPlayrRef.current.seekTo(newTime); 
     }
   }
@@ -170,7 +183,7 @@ function App() {
   return (
     <div id='player-container'>
       <video width={1280} height={720} id={videoElementId}></video>
-      <div id='control-bar'>
+      <div id='control-bar' style={{ display: isAdPlaying ? 'none' : 'flex' }}>
         <div className="left-controls">
           <button onClick={play}>Play</button>
           <button onClick={pause}>Pause</button>
