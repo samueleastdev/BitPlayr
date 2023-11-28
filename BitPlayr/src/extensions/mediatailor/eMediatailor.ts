@@ -3,18 +3,26 @@ import { TimeUpdateEvent } from '../../players/interfaces/iPlayers';
 import { MediaTailorConfig } from '../../service/mediatailor/config/cMediatailor';
 import { getUrl } from '../../utils/fetch';
 import { IPlayerExtension } from '../interfaces/common';
+import ProgressBar from 'progressbar.js';
 
 export class MediatailorExtension implements IPlayerExtension {
   private adsData: any[];
   private adOverlayDiv: HTMLElement | null;
+  private progressBar: any;
+  private player: Player | null;
+  private videoElement: HTMLElement | null;
 
   constructor() {
     this.adsData = [];
     this.adOverlayDiv = null;
+    this.videoElement = null;
+    this.progressBar = null;
+    this.player = null;
   }
 
   apply(player: Player) {
-    // Bind 'this' context to the event handler methods
+    this.player = player;
+
     this.handleInitialize = this.handleInitialize.bind(this);
     this.handleManifestAvailable = this.handleManifestAvailable.bind(this);
     this.handleLoadedMetadata = this.handleLoadedMetadata.bind(this);
@@ -25,56 +33,46 @@ export class MediatailorExtension implements IPlayerExtension {
     player.on('loadedmetadata', this.handleLoadedMetadata);
     player.on('timeupdate', this.handleTimeupdate);
 
-    const videoElementId = player.getVideoElementId();
-    const videoElement = document.getElementById(videoElementId);
+    this.createProgressBar();
+  }
 
-    // Create the overlay div
+  createProgressBar() {
+    if (!this.player) return;
     this.adOverlayDiv = document.createElement('div');
     this.adOverlayDiv.style.position = 'absolute';
-    this.adOverlayDiv.style.bottom = '20px';
-    this.adOverlayDiv.style.left = '60px';
-    this.adOverlayDiv.style.transform = 'translate(-50%, -50%)';
-    this.adOverlayDiv.style.width = '80px'; // Circular shape
-    this.adOverlayDiv.style.height = '80px'; // Circular shape
-    this.adOverlayDiv.style.borderRadius = '50%'; // Circular shape
-    this.adOverlayDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    this.adOverlayDiv.style.display = 'flex';
-    this.adOverlayDiv.style.justifyContent = 'center';
-    this.adOverlayDiv.style.alignItems = 'center';
-    this.adOverlayDiv.style.color = 'white';
-    this.adOverlayDiv.style.fontSize = '12px';
-    this.adOverlayDiv.style.display = 'none'; // Initially hidden
+    this.adOverlayDiv.style.bottom = '40px';
+    this.adOverlayDiv.style.left = '40px';
+    this.adOverlayDiv.style.width = '80px';
+    this.adOverlayDiv.style.height = '80px';
+    this.adOverlayDiv.style.display = 'none';
+    this.adOverlayDiv.id = 'ad-overlay';
 
-    const progressBarContainer = document.createElement('div');
-    progressBarContainer.style.width = '80px';
-    progressBarContainer.style.height = '80px';
-    progressBarContainer.style.position = 'absolute';
-    progressBarContainer.style.top = '0';
-    progressBarContainer.style.left = '0';
-    progressBarContainer.style.borderRadius = '50%';
-    progressBarContainer.style.transform = 'rotate(-90deg)'; // Initial rotation
-    this.adOverlayDiv.appendChild(progressBarContainer);
+    this.progressBar = new ProgressBar.Circle(this.adOverlayDiv, {
+      strokeWidth: 8,
+      color: '#FFEA82',
+      trailColor: '#000',
+      trailWidth: 8,
+      easing: 'easeInOut',
+      duration: 1400,
+      svgStyle: null,
+      fill: 'rgba(0, 0, 0)',
+      text: {
+        autoStyleContainer: false,
+        value: 'Ad',
+      },
+      from: { color: 'rgb(255, 234, 130)' },
+      to: { color: 'rgb(255, 234, 130)' },
+      step: (state, circle) => {
+        if (circle && circle.path) {
+          circle.path.setAttribute('stroke', state.color);
+        }
+      },
+    });
 
-    const progressBar = document.createElement('div');
-    progressBar.style.width = '100%';
-    progressBar.style.height = '100%';
-    progressBar.style.borderRadius = '50%';
-    progressBar.style.border = '5px solid green';
-    progressBar.style.borderRightColor = 'transparent';
-    progressBar.style.boxSizing = 'border-box';
-    progressBarContainer.appendChild(progressBar);
-
-    const adTextDiv = document.createElement('div');
-    adTextDiv.style.position = 'absolute';
-    adTextDiv.style.top = '50%';
-    adTextDiv.style.left = '50%';
-    adTextDiv.style.transform = 'translate(-50%, -50%)';
-    adTextDiv.style.color = 'white';
-    adTextDiv.style.fontSize = '12px';
-    adTextDiv.innerText = 'Advertisement'; // Default text
-    this.adOverlayDiv.appendChild(adTextDiv);
-
-    videoElement?.parentNode?.insertBefore(this.adOverlayDiv, videoElement.nextSibling);
+    this.videoElement = document.getElementById(this.player.getVideoElementId());
+    if (this.videoElement && this.videoElement.parentNode) {
+      this.videoElement.parentNode.insertBefore(this.adOverlayDiv, this.videoElement.nextSibling);
+    }
   }
 
   handleInitialize(player: any) {}
@@ -110,24 +108,30 @@ export class MediatailorExtension implements IPlayerExtension {
     }
 
     if (isAdPlaying && this.adOverlayDiv) {
-      const progressBarContainer = this.adOverlayDiv.firstChild as HTMLElement;
-      const adTextDiv = this.adOverlayDiv.lastChild as HTMLElement;
+      if (this.videoElement && this.videoElement.parentNode) {
+        const controlBar = this.videoElement.parentNode.querySelector('#control-bar');
+        if (controlBar instanceof HTMLElement) {
+          controlBar.style.display = 'none';
+        }
+      }
+
       const currentTimeInAd = event.currentTime - adStartTime;
       const remainingTime = adDuration - currentTimeInAd;
-      const percentage = (currentTimeInAd / adDuration) * 100;
-      const angle = percentage * 3.6; // Convert percentage to degrees
+      const progress = currentTimeInAd / adDuration;
 
-      if (progressBarContainer) {
-        progressBarContainer.style.transform = `rotate(${angle - 90}deg)`;
+      if (this.progressBar) {
+        this.progressBar.animate(progress * 2);
+        this.progressBar.setText(`${Math.ceil(remainingTime)}s`);
       }
-
-      if (adTextDiv) {
-        adTextDiv.innerText = `Ad in ${remainingTime.toFixed(0)}s`;
-      }
-
-      this.adOverlayDiv.style.display = 'block'; // Show overlay
+      this.adOverlayDiv.style.display = 'block';
     } else if (this.adOverlayDiv) {
-      this.adOverlayDiv.style.display = 'none'; // Hide overlay
+      if (this.videoElement && this.videoElement.parentNode) {
+        const controlBar = this.videoElement.parentNode.querySelector('#control-bar');
+        if (controlBar instanceof HTMLElement) {
+          controlBar.style.display = 'flex';
+        }
+      }
+      this.adOverlayDiv.style.display = 'none';
     }
   }
 }
