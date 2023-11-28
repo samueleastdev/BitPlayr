@@ -1,7 +1,7 @@
-import { IPlayerPlugin, Player } from 'bitplayr';
+import { IPlayerExtension, Player } from 'bitplayr';
 
 
-export class TestPlugin implements IPlayerPlugin {
+export class TestPlugin implements IPlayerExtension {
   apply(player: Player) {
     player.on('timeupdate', this.handleTimeUpdate);
   }

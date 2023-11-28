@@ -1,0 +1,9 @@
+export { LogLevel } from './logger/logger';
+export { BasicCapabilites } from './capabilities/basic/cBasic';
+export { BasicService } from './service/basic/sBasic';
+export { MediatailorService } from './service/mediatailor/sMediatailor';
+export { ThumbnailExtension } from './extensions/thumbnails/eThumbnail';
+export { MediatailorExtension } from './extensions/mediatailor/eMediatailor';
+export { IPlayerExtension } from './extensions/interfaces/common';
+export { Player } from './core/basePlayer';
+export { BitPlayr } from './bitplayr';
