@@ -1,5 +1,5 @@
 import { SdkConfig } from '../core/configs/sdkConfig';
-import { VProvider } from '../extensions/interfaces/common';
+import { IVideoService } from '../core/interfaces/ICommon';
 import { DashJsStrategy } from './dashjs';
 import dashjs from 'dashjs';
 
@@ -14,7 +14,7 @@ jest.mock('dashjs', () => ({
 
 describe('DashJsStrategy', () => {
   let dashJsStrategy: DashJsStrategy; // Specify the type
-  let provider: VProvider; // Specify the type
+  let provider: IVideoService; // Specify the type
   const mockVideoElement = {
     /* Mock properties and methods of HTMLMediaElement */
   };

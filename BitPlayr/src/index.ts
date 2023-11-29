@@ -1,9 +1,20 @@
 export { LogLevel } from './logger/logger';
-export { BasicCapabilites } from './capabilities/basic/cBasic';
-export { BasicService } from './service/basic/sBasic';
-export { MediatailorService } from './service/mediatailor/sMediatailor';
-export { ThumbnailExtension } from './extensions/thumbnails/eThumbnail';
-export { MediatailorExtension } from './extensions/mediatailor/eMediatailor';
-export { IPlayerExtension } from './extensions/interfaces/common';
+
+// Capabilities
+export { BasicCapabilities } from './capabilities/basic/basic';
+export { BasicService } from './service/basic/basic';
+
+// Services
+export { MediatailorService } from './service/mediatailor/mediatailor';
+
+// Extensions
+export { ThumbnailsExtension } from './extensions/thumbnails/thumbnails';
+export { MediatailorExtension } from './extensions/mediatailor/mediatailor';
+
+// Interfaces
+export { IPlayerExtension } from './extensions/interfaces/ICommon';
+export { IVideoService } from './core/interfaces/ICommon';
+
+// Base
 export { Player } from './core/basePlayer';
 export { BitPlayr } from './bitplayr';

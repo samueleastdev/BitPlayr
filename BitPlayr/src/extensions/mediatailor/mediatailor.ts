@@ -1,9 +1,9 @@
 import { Player } from '../../core/basePlayer';
-import { TimeUpdateEvent } from '../../players/interfaces/iPlayers';
-import { MediaTailorConfig } from '../../service/mediatailor/config/cMediatailor';
+import { TimeUpdateEvent } from '../../players/interfaces/IPlayers';
+import { MediaTailorConfig } from '../../service/mediatailor/config/mediatailor';
 import { getUrl } from '../../utils/fetch';
-import { IPlayerExtension } from '../interfaces/common';
-import { Ad, AdBreak } from './interfaces/iMediatailor';
+import { IPlayerExtension } from '../interfaces/ICommon';
+import { Ad, AdBreak } from './interfaces/IMediatailor';
 
 export class MediatailorExtension implements IPlayerExtension {
   private player: Player | null;

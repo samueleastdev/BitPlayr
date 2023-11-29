@@ -1,11 +1,11 @@
-import { IPlayerStrategy, TimeUpdateEvent } from '../players/interfaces/iPlayers';
-import { VProvider } from '../extensions/interfaces/common';
+import { IPlayerStrategy, TimeUpdateEvent } from '../players/interfaces/IPlayers';
+import { IVideoService } from './interfaces/ICommon';
 
 export abstract class BasePlayerStrategy implements IPlayerStrategy {
   protected videoElement!: HTMLMediaElement;
   protected videoElementId!: string;
 
-  abstract init(videoElementId: string, provider: VProvider): void;
+  abstract init(videoElementId: string, provider: IVideoService): void;
 
   onManifestAvailable(callback: (event: any) => void): void {
     // callback will be used in subclass implementations

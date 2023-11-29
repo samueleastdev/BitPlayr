@@ -1,12 +1,10 @@
-import { Player } from '../../core/basePlayer';
-import { IPlayerConfig, ISdkConfig } from '../../core/configs/interfaces/iConfigs';
+import { IDeviceCapabilities } from '../../capabilities/interfaces/ICommon';
+import { ISdkConfig } from '../configs/interfaces/IConfigs';
+import { IPlayerExtension } from '../../extensions/interfaces/ICommon';
 
-export interface VProvider {
+export interface IVideoService {
   manifestUrl: string;
   trackingUrl?: string;
-}
-export interface IPlayerExtension {
-  apply(player: Player): void;
 }
 
 export enum EPlayerTypes {
@@ -21,6 +19,6 @@ export interface IPlayers {
 
 export interface IGlobalConfig {
   extensions: IPlayerExtension[];
-  deviceCapabilities: any;
+  deviceCapabilities: IDeviceCapabilities;
   sdkConfig: ISdkConfig;
 }

@@ -1,9 +1,9 @@
 import dashjs from 'dashjs';
 import { BasePlayerStrategy } from '../core/basePlayerStrategy';
 import { WithTelemetry } from '../telementry/decorators';
-import { VProvider } from '../extensions/interfaces/common';
 import { SDKLogger } from '../logger/logger';
 import { SdkConfig } from '../core/configs/sdkConfig';
+import { IVideoService } from '../core/interfaces/ICommon';
 
 export class DashJsStrategy extends BasePlayerStrategy {
   private dashPlayer!: dashjs.MediaPlayerClass;
@@ -17,7 +17,7 @@ export class DashJsStrategy extends BasePlayerStrategy {
   }
 
   @WithTelemetry
-  init(videoElementId: string, provider: VProvider): void {
+  init(videoElementId: string, provider: IVideoService): void {
     this.videoElement = document.getElementById(videoElementId) as HTMLMediaElement;
 
     if (!this.videoElement) {

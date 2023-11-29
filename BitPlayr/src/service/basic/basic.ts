@@ -1,4 +1,4 @@
-import { IService } from '../interfaces/common';
+import { IService } from '../interfaces/ICommon';
 
 // BasicService implementation
 export class BasicService implements IService {

@@ -1,12 +1,12 @@
-import { IPlayerStrategy } from '../../players/interfaces/iPlayers';
-import { EPlayerTypes } from '../../extensions/interfaces/common';
+import { IPlayerStrategy } from '../../players/interfaces/IPlayers';
 import { supportsDashPlayback } from '../../utils/dash';
 import { supportsHlsPlayback } from '../../utils/hls';
-import { IDeviceCapabilities } from '../interfaces/common';
-import { IBasicOptions } from './interfaces/iBasic';
-import { IPlayerConfig } from '../../core/configs/interfaces/iConfigs';
+import { IDeviceCapabilities } from '../interfaces/ICommon';
+import { IBasicOptions } from './interfaces/IBasic';
+import { IPlayerConfig } from '../../core/configs/interfaces/IConfigs';
+import { EPlayerTypes } from '../../core/interfaces/ICommon';
 
-export class BasicCapabilites implements IDeviceCapabilities {
+export class BasicCapabilities implements IDeviceCapabilities {
   private playerConfig: IPlayerConfig;
   private player = EPlayerTypes.HLSJS;
   constructor(private options: IBasicOptions) {

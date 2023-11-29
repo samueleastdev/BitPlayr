@@ -1,4 +1,4 @@
-import { ISdkConfig } from './interfaces/iConfigs';
+import { ISdkConfig } from './interfaces/IConfigs';
 
 export class SdkConfig {
   private static config: ISdkConfig;

@@ -1,3 +1,3 @@
-export interface MediatailorConfig {
+export interface IMediatailorConfig {
   trackingUrl: string;
 }

@@ -1,10 +1,9 @@
 import videojs from 'video.js';
 import { BasePlayerStrategy } from '../core/basePlayerStrategy';
 import { WithTelemetry } from '../telementry/decorators';
-import { VProvider } from '../extensions/interfaces/common';
-import { PlayerConfig } from '../core/configs/playerConfig';
 import { SDKLogger } from '../logger/logger';
 import { SdkConfig } from '../core/configs/sdkConfig';
+import { IVideoService } from '../core/interfaces/ICommon';
 
 export class VideoJsStrategy extends BasePlayerStrategy {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -20,7 +19,7 @@ export class VideoJsStrategy extends BasePlayerStrategy {
   }
 
   @WithTelemetry
-  init(videoElementId: string, provider: VProvider): void {
+  init(videoElementId: string, provider: IVideoService): void {
     this.videoElement = document.getElementById(videoElementId) as HTMLVideoElement;
 
     if (!this.videoElement) {

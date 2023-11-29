@@ -1,4 +1,5 @@
-import { IPlayerExtension, VProvider } from '../../extensions/interfaces/common';
+import { IVideoService } from '../../core/interfaces/ICommon';
+import { IPlayerExtension } from '../../extensions/interfaces/ICommon';
 
 export interface TimeUpdateEvent {
   currentTime: number;
@@ -6,7 +7,7 @@ export interface TimeUpdateEvent {
 }
 
 export interface IPlayerStrategy {
-  init(videoElementId: string, provider: VProvider): void;
+  init(videoElementId: string, provider: IVideoService): void;
   onTimeUpdate(callback: (event: TimeUpdateEvent) => void): void;
   onSeeked(callback: (time: number) => void): void;
   onManifestAvailable(callback: (data: any) => void): void;

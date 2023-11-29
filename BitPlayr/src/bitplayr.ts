@@ -1,11 +1,10 @@
 import { Player } from './core/basePlayer';
-import { PlayerConfig } from './core/configs/playerConfig';
 import { SdkConfig } from './core/configs/sdkConfig';
-import { IGlobalConfig, VProvider } from './extensions/interfaces/common';
-import { IService } from './service/interfaces/common';
+import { IGlobalConfig, IVideoService } from './core/interfaces/ICommon';
+import { IService } from './service/interfaces/ICommon';
 
 export class BitPlayr {
-  static async videoProvider(service: IService): Promise<VProvider> {
+  static async videoProvider(service: IService): Promise<IVideoService> {
     const url = await service.getUrl();
     return { manifestUrl: url };
   }

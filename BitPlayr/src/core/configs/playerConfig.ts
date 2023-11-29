@@ -1,4 +1,4 @@
-import { IPlayerConfig } from './interfaces/iConfigs';
+import { IPlayerConfig } from './interfaces/IConfigs';
 
 export class PlayerConfig {
   private static config: IPlayerConfig;

@@ -5,12 +5,11 @@
 */
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { BitPlayr, ThumbnailExtension, MediatailorExtension, BasicCapabilites, BasicService, MediatailorService, LogLevel } from 'bitplayr';
-import { VProvider } from 'bitplayr/dist/extensions/interfaces/common';
+import { BitPlayr, ThumbnailsExtension, MediatailorExtension, BasicCapabilities, MediatailorService, LogLevel, IVideoService } from 'bitplayr';
 
 
 interface IPlayer {
-  initialize(vp: VProvider): unknown;
+  initialize(vp: IVideoService): unknown;
   on(arg0: string, arg1: (event: any) => void): unknown;
   play: () => void;
   pause: () => void;
@@ -28,8 +27,8 @@ function App() {
     const initializePlayer = async () => {
 
       const playerOptions = {
-        extensions: [new ThumbnailExtension(), new MediatailorExtension()],
-        deviceCapabilities: new BasicCapabilites({ 
+        extensions: [new ThumbnailsExtension(), new MediatailorExtension()],
+        deviceCapabilities: new BasicCapabilities({ 
           default: 'hls.js', // dash.js | hls.js | video.js
           playerConfig: {
             videojs: {},

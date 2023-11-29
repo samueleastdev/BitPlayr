@@ -1,5 +1,5 @@
-import { IService } from '../interfaces/common';
-import { MediaTailorConfig } from './config/cMediatailor';
+import { IService } from '../interfaces/ICommon';
+import { MediaTailorConfig } from './config/mediatailor';
 
 export class MediatailorService implements IService {
   private url: string;

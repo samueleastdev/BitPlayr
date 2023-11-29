@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
-import { IPlayerStrategy } from '../players/interfaces/iPlayers';
-import { VProvider } from '../extensions/interfaces/common';
+import { IPlayerStrategy } from '../players/interfaces/IPlayers';
+import { IVideoService } from './interfaces/ICommon';
 
 export class Player extends EventEmitter {
   private playerStrategy: IPlayerStrategy;
@@ -12,7 +12,7 @@ export class Player extends EventEmitter {
     this.videoElementId = videoElementId;
   }
 
-  initialize(provider: VProvider): void {
+  initialize(provider: IVideoService): void {
     this.playerStrategy.init(this.videoElementId, provider);
     this.emit('initialize', true);
     this.playerStrategy.onTimeUpdate((time) => this.emit('timeupdate', time));
