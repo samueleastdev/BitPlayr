@@ -3,22 +3,22 @@
 ### Setup
 
 cd into BitPlayr SDK and run
-~~~
+~~~sh
 npm link
 ~~~
 
 cd into react-app and run
-~~~
+~~~sh
 npm link bitplayr
 ~~~
 
 Start the SDK with
-~~~
+~~~sh
 npm run watch
 ~~~
 
 Start React App
-~~~
+~~~sh
 npm start
 ~~~
 
@@ -26,14 +26,14 @@ npm start
 
 We have a new tool to generate extensions.
 
-~~~
+~~~sh
 cd BitPlayr/tools/generator
 chmod +x create-extension.js
 npm link
 ~~~
 
 Now run 
-~~~
+~~~sh
 extension
 ~~~
 
