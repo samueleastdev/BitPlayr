@@ -10,14 +10,14 @@ Detailed API documentation for MediatailorExtension.
 
 ### Events
 
-```
+```js
 bitPlayrRef.current.on('adBreakData', (adBreakData) => {
   console.log('Ad Break Data:', adBreakData);
 });
 
 bitPlayrRef.current.on('adIsPlaying', (data) => {
   setIsAdPlaying(data.isPlaying);
-  if(data.isPlaying){
+  if (data.isPlaying) {
     console.log('adIsPlaying:', data);
   }
 });
