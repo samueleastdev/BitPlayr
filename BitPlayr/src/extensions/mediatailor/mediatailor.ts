@@ -23,7 +23,7 @@ export class MediatailorExtension implements IPlayerExtension {
   }
 
   async handleLoadedMetadata() {
-    if (MediaTailorConfig.getConfig().trackingUrl) {
+    if (MediaTailorConfig.getConfig() && MediaTailorConfig.getConfig().trackingUrl) {
       const results = await getUrl(MediaTailorConfig.getConfig().trackingUrl);
       if (this.player) {
         this.adBreak = results.avails;

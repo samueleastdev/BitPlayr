@@ -99,7 +99,6 @@ function App() {
           if(data.isPlaying){
             console.log('adIsPlaying:', data);
           }
-          
         });
 
       } catch (error) {
