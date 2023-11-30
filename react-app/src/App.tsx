@@ -8,6 +8,14 @@ import './App.css';
 import { BitPlayr, ThumbnailsExtension, MediatailorExtension, BasicCapabilities, MediatailorService, LogLevel, IVideoService } from 'bitplayr';
 import TimeDisplay from './controls/TimeDisplay';
 import AdProgress from './controls/AdProgress';
+import ProgressBar from './controls/ProgressBar';
+
+// Importing MUI Icons and Styles
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import IconButton from '@mui/material/IconButton';
 
 interface IPlayer {
   initialize(vp: IVideoService): unknown;
@@ -21,12 +29,15 @@ interface IPlayer {
 function App() {
   const videoElementId = 'video-element--sam';
   const bitPlayrRef = useRef<IPlayer | null>(null);
-  const progressBarRef = useRef(null);
   const [isAdPlaying, setIsAdPlaying] = useState(false);
+  const [adBreaks, setAdBreaks] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [percentage, setPercentage] = useState(0);
   const [adTime, setAdTime] = useState(0);
+  const [bufferedAhead, setBufferedAhead] = useState(0);
+  const [bufferedBehind, setBufferedBehind] = useState(0);
 
   useEffect(() => {
     const initializePlayer = async () => {
@@ -78,8 +89,6 @@ function App() {
           throw new Error('Manifest URL not found');
         }
 
-        const progressBar = document.getElementById('progress');
-
         bitPlayrRef.current.initialize(vp);
 
         bitPlayrRef.current.on('timeupdate', (event) => {
@@ -87,8 +96,14 @@ function App() {
           const duration = event.duration;
           setCurrentTime(currentTime);
           setDuration(duration);
-          const percentage = (currentTime / duration) * 100;
-          progressBar!.style.width = `${percentage}%`;
+
+          const videoElement = bitPlayrRef!.current!.playerStrategy!.videoElement;
+          if (videoElement && videoElement.buffered.length > 0) {
+            const bufferEnd = videoElement.buffered.end(videoElement.buffered.length - 1);
+            setBufferedAhead(Math.max(0, bufferEnd - currentTime)); // Ensure it's not negative
+            setBufferedBehind(Math.max(0, currentTime - videoElement.buffered.start(0))); // Ensure it's not negative
+          }
+
         });
 
         bitPlayrRef.current.on('seeked', (event) => {
@@ -105,6 +120,13 @@ function App() {
 
         bitPlayrRef.current.on('adBreakData', (adBreakData) => {
           console.log('Ad Break Data:', adBreakData);
+          const parsedAdBreaks = adBreakData.map(adBreak => {
+            return {
+              startTime: adBreak.startTimeInSeconds,
+              duration: adBreak.durationInSeconds
+            };
+          });
+          setAdBreaks(parsedAdBreaks);
         });
 
         bitPlayrRef.current.on('adTrackingPinged', (url) => {
@@ -133,21 +155,19 @@ function App() {
     };
   }, [videoElementId]);
 
-  
-  function play(){
-    if(bitPlayrRef.current){
-      bitPlayrRef.current.play().then(() => {
-        console.log('Playback started successfully');
-      })
-      .catch((error) => {
-        console.error('Error trying to play the media:', error);
-      });
-    }
-  }
-
-  function pause(){
-    if(bitPlayrRef.current){
-      bitPlayrRef.current?.pause();
+  const togglePlayPause = () => {
+    if (bitPlayrRef.current) {
+      if (isPlaying) {
+        bitPlayrRef.current.pause();
+      } else {
+        bitPlayrRef.current.play().then(() => {
+          console.log('Playback started successfully');
+        })
+        .catch((error) => {
+          console.error('Error trying to play the media:', error);
+        });
+      }
+      setIsPlaying(!isPlaying); // Toggle the playing state
     }
   }
 
@@ -169,50 +189,39 @@ function App() {
     }
   }
 
-  function progress(e){
-    if (bitPlayrRef.current && progressBarRef.current) {
-      const rect = progressBarRef.current.getBoundingClientRect();
-      const newTime = ((e.clientX - rect.left) / rect.width) * bitPlayrRef.current!.playerStrategy.videoElement.duration; 
-      bitPlayrRef.current.seekTo(newTime); 
+  const handleSeek = (newTime) => {
+    if (bitPlayrRef.current) {
+      bitPlayrRef.current.seekTo(newTime);
     }
-  }
-
-  function handleDragStart(e) {
-    e.preventDefault();
-    window.addEventListener('mousemove', handleDragging);
-    window.addEventListener('mouseup', handleDragEnd);
-  }
-
-  function handleDragging(e) {
-    if (bitPlayrRef.current && progressBarRef.current) {
-      const rect = progressBarRef.current.getBoundingClientRect();
-      const newTime = ((e.clientX - rect.left) / rect.width) * bitPlayrRef.current!.playerStrategy.videoElement.duration;
-      bitPlayrRef.current.seekTo(newTime); 
-    }
-  }
-
-  function handleDragEnd() {
-    window.removeEventListener('mousemove', handleDragging);
-    window.removeEventListener('mouseup', handleDragEnd);
-  }
+  };
 
   return (
     <div id='player-container'>
       <video width={1280} height={720} id={videoElementId}></video>
       <AdProgress adPercentage={percentage} adTime={adTime} isAdPlaying={isAdPlaying} />
       <div id='control-bar' style={{ display: isAdPlaying ? 'none' : 'flex' }}>
-        <div className="progress-bar" ref={progressBarRef} onClick={progress} onMouseDown={handleDragStart}>
-          <div className="progress" id="progress"></div>
-        </div>
+        <ProgressBar 
+          currentTime={currentTime} 
+          duration={duration} 
+          bufferedAhead={bufferedAhead} 
+          bufferedBehind={bufferedBehind}
+          adBreaks={adBreaks}
+          onSeek={handleSeek} 
+        />
         <div className='control-bar-buttons'>
           <div className="left-controls">
-            <button onClick={play}>Play</button>
-            <button onClick={pause}>Pause</button>
-            <button onClick={restart}>Restart</button>
+            <IconButton onClick={togglePlayPause} color="primary">
+              {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
+            </IconButton>
+            <IconButton onClick={restart} color="primary">
+              <RestartAltIcon />
+            </IconButton>
             <TimeDisplay currentTime={currentTime} duration={duration} />
           </div>
           <div className="right-controls">
-            <button onClick={fullscreen}>Go Fullscreen</button>
+            <IconButton onClick={fullscreen} color="primary">
+              <FullscreenIcon />
+            </IconButton>
           </div>
         </div>
       </div>

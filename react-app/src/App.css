@@ -19,16 +19,40 @@
 }
 
 .progress-bar {
-  height: 5px;
+  position: relative;
   width: 100%;
-  cursor: pointer;
-  background-color: #555;
+  height: 5px;
+  background-color: #ddd;
+}
+
+.buffered-behind, .buffered-ahead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color:  blue;
+}
+
+.buffered-behind {
+  left: 0;
+}
+
+.buffered-ahead {
+  right: 0;
 }
 
 .progress {
-  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
   background-color: #2196F3;
-  width: 0%;
+}
+
+.ad-break {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(255, 0, 0, 0.5);
+  z-index: 999;
 }
 
 .control-bar-buttons {
@@ -66,4 +90,8 @@
   bottom: 20px !important;
   left: 20px !important;
   
+}
+
+.MuiIconButton-root {
+  border-radius: 0% !important;
 }
