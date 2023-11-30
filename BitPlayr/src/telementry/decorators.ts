@@ -1,4 +1,4 @@
-import { SdkConfig } from '../core/configs/sdkConfig';
+import { SdkConfig } from '../configs/sdkConfig';
 import { SDKLogger } from '../logger/logger';
 
 export function WithTelemetry(

@@ -6,7 +6,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { BitPlayr, ThumbnailsExtension, MediatailorExtension, BasicCapabilities, MediatailorService, LogLevel, IVideoService } from 'bitplayr';
-
+import TimeDisplay from './controls/TimeDisplay';
+import AdProgress from './controls/AdProgress';
 
 interface IPlayer {
   initialize(vp: IVideoService): unknown;
@@ -22,6 +23,10 @@ function App() {
   const bitPlayrRef = useRef<IPlayer | null>(null);
   const progressBarRef = useRef(null);
   const [isAdPlaying, setIsAdPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [percentage, setPercentage] = useState(0);
+  const [adTime, setAdTime] = useState(0);
 
   useEffect(() => {
     const initializePlayer = async () => {
@@ -78,7 +83,11 @@ function App() {
         bitPlayrRef.current.initialize(vp);
 
         bitPlayrRef.current.on('timeupdate', (event) => {
-          const percentage = (event.currentTime / event.duration) * 100;
+          const currentTime = event.currentTime;
+          const duration = event.duration;
+          setCurrentTime(currentTime);
+          setDuration(duration);
+          const percentage = (currentTime / duration) * 100;
           progressBar!.style.width = `${percentage}%`;
         });
 
@@ -90,14 +99,23 @@ function App() {
           
         });
 
+        bitPlayrRef.current.on('loadedmetadata', (event) => {
+          setDuration(event.target.duration);
+        });
+
         bitPlayrRef.current.on('adBreakData', (adBreakData) => {
           console.log('Ad Break Data:', adBreakData);
+        });
+
+        bitPlayrRef.current.on('adTrackingPinged', (url) => {
+          console.log('Tracking Pinged:', url);
         });
 
         bitPlayrRef.current.on('adIsPlaying', (data) => {
           setIsAdPlaying(data.isPlaying);
           if(data.isPlaying){
-            console.log('adIsPlaying:', data);
+            setPercentage(data.progress);
+            setAdTime(data.remainingTime);
           }
         });
 
@@ -115,7 +133,7 @@ function App() {
     };
   }, [videoElementId]);
 
-
+  
   function play(){
     if(bitPlayrRef.current){
       bitPlayrRef.current.play().then(() => {
@@ -181,17 +199,21 @@ function App() {
   return (
     <div id='player-container'>
       <video width={1280} height={720} id={videoElementId}></video>
+      <AdProgress adPercentage={percentage} adTime={adTime} isAdPlaying={isAdPlaying} />
       <div id='control-bar' style={{ display: isAdPlaying ? 'none' : 'flex' }}>
-        <div className="left-controls">
-          <button onClick={play}>Play</button>
-          <button onClick={pause}>Pause</button>
-          <button onClick={restart}>Restart</button>
-        </div>
         <div className="progress-bar" ref={progressBarRef} onClick={progress} onMouseDown={handleDragStart}>
           <div className="progress" id="progress"></div>
         </div>
-        <div className="right-controls">
-          <button onClick={fullscreen}>Go Fullscreen</button>
+        <div className='control-bar-buttons'>
+          <div className="left-controls">
+            <button onClick={play}>Play</button>
+            <button onClick={pause}>Pause</button>
+            <button onClick={restart}>Restart</button>
+            <TimeDisplay currentTime={currentTime} duration={duration} />
+          </div>
+          <div className="right-controls">
+            <button onClick={fullscreen}>Go Fullscreen</button>
+          </div>
         </div>
       </div>
     </div>

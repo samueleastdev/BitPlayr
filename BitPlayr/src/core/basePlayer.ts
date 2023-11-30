@@ -8,17 +8,21 @@ export class Player extends EventEmitter {
 
   constructor(playerStrategy: IPlayerStrategy, videoElementId: string) {
     super();
-    this.playerStrategy = playerStrategy;
     this.videoElementId = videoElementId;
+    this.playerStrategy = playerStrategy;
+    this.playerStrategy.createPlayer(videoElementId);
+    this.attachEvents();
   }
 
-  initialize(provider: IVideoService): void {
-    this.playerStrategy.init(this.videoElementId, provider);
-    this.emit('initialize', true);
+  attachEvents() {
     this.playerStrategy.onTimeUpdate((time) => this.emit('timeupdate', time));
     this.playerStrategy.onSeeked((time) => this.emit('seeked', time));
     this.playerStrategy.onManifestAvailable((event) => this.emit('manifestAvailable', event));
     this.playerStrategy.onLoadedMetadata((event) => this.emit('loadedmetadata', event));
+  }
+
+  initialize(provider: IVideoService): void {
+    this.playerStrategy.load(provider);
   }
 
   getVideoElementId(): string {

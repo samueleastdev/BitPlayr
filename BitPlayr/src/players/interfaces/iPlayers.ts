@@ -4,10 +4,12 @@ import { IPlayerExtension } from '../../extensions/interfaces/ICommon';
 export interface TimeUpdateEvent {
   currentTime: number;
   duration: number;
+  timeDisplay?: string;
 }
 
 export interface IPlayerStrategy {
-  init(videoElementId: string, provider: IVideoService): void;
+  createPlayer(videoElementId: string): void;
+  load(provider: IVideoService): void;
   onTimeUpdate(callback: (event: TimeUpdateEvent) => void): void;
   onSeeked(callback: (time: number) => void): void;
   onManifestAvailable(callback: (data: any) => void): void;

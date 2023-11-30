@@ -1,5 +1,5 @@
 import { Player } from './core/basePlayer';
-import { SdkConfig } from './core/configs/sdkConfig';
+import { SdkConfig } from './configs/sdkConfig';
 import { IGlobalConfig, IVideoService } from './core/interfaces/ICommon';
 import { IService } from './service/interfaces/ICommon';
 

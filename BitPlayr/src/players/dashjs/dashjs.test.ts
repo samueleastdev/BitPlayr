@@ -1,5 +1,5 @@
-import { SdkConfig } from '../core/configs/sdkConfig';
-import { IVideoService } from '../core/interfaces/ICommon';
+import { SdkConfig } from '../../configs/sdkConfig';
+import { IVideoService } from '../../core/interfaces/ICommon';
 import { DashJsStrategy } from './dashjs';
 import dashjs from 'dashjs';
 
@@ -42,7 +42,8 @@ describe('DashJsStrategy', () => {
   it('should initialize Dash.js player with the correct parameters', () => {
     const videoElementId = 'test-video-element';
 
-    dashJsStrategy.init(videoElementId, provider);
+    dashJsStrategy.createPlayer(videoElementId);
+    dashJsStrategy.load(provider);
 
     expect(document.getElementById).toHaveBeenCalledWith(videoElementId);
     expect(dashjs.MediaPlayer().create().initialize).toHaveBeenCalledWith(
@@ -56,7 +57,8 @@ describe('DashJsStrategy', () => {
     const videoElementId = 'non-existent-element';
 
     expect(() => {
-      dashJsStrategy.init(videoElementId, provider);
+      dashJsStrategy.createPlayer(videoElementId);
+      dashJsStrategy.load(provider);
     }).toThrow(`Element with ID '${videoElementId}' not found.`);
   });
 });

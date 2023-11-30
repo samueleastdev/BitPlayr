@@ -3,7 +3,7 @@ import { TimeUpdateEvent } from '../../players/interfaces/IPlayers';
 import { MediaTailorConfig } from '../../service/mediatailor/config/mediatailor';
 import { getUrl } from '../../utils/fetch';
 import { IPlayerExtension } from '../interfaces/ICommon';
-import { Ad, AdBreak } from './interfaces/IMediatailor';
+import { Ad, AdBreak, TrackingEvent } from './interfaces/IMediatailor';
 
 export class MediatailorExtension implements IPlayerExtension {
   private player: Player | null;
@@ -32,6 +32,21 @@ export class MediatailorExtension implements IPlayerExtension {
     }
   }
 
+  async pingTrackingEvents(trackingUrls: string[]) {
+    for (const url of trackingUrls) {
+      if (url) {
+        try {
+          this.player?.emit('adTrackingPinged', url);
+          await getUrl(url);
+        } catch (error) {
+          console.error(`Error pinging tracking URL: ${url}`, error);
+        }
+      } else {
+        //console.log('empty url');
+      }
+    }
+  }
+
   handleTimeupdate(event: TimeUpdateEvent) {
     let isAdPlaying = false;
     let adDuration = 0;
@@ -54,13 +69,32 @@ export class MediatailorExtension implements IPlayerExtension {
         if (isAdPlaying) break;
       }
     }
-    if (this.player) {
+
+    if (adData) {
       const currentTimeInAd = event.currentTime - adStartTime;
-      this.player.emit('adIsPlaying', {
+
+      // Filter tracking URLs based on the current time within the ad.
+      /*if (adData.trackingEvents) {
+        const trackingUrlsToPing = adData.trackingEvents
+          .filter((trackingEvent: TrackingEvent) => {
+            const eventTime = trackingEvent.offsetInSeconds || 0;
+            return currentTimeInAd >= eventTime;
+          })
+          .map((trackingEvent) => trackingEvent.url);
+
+        // Ping the tracking event URLs.
+        this.pingTrackingEvents(trackingUrlsToPing);
+      }*/
+      // Emit event data as before.
+      this.player?.emit('adIsPlaying', {
         isPlaying: isAdPlaying,
         remainingTime: adDuration - currentTimeInAd,
         progress: currentTimeInAd / adDuration,
         ad: adData,
+      });
+    } else {
+      this.player?.emit('adIsPlaying', {
+        isPlaying: false,
       });
     }
   }

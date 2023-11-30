@@ -33,7 +33,9 @@ export interface Ad {
   vastAdId: string;
 }
 
-interface TrackingEvent {
+export interface TrackingEvent {
+  offsetInSeconds: number;
+  url: any;
   beaconUrls: string[];
   duration: string;
   durationInSeconds: number;

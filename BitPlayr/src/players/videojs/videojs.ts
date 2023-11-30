@@ -1,26 +1,23 @@
 import videojs from 'video.js';
-import { BasePlayerStrategy } from '../core/basePlayerStrategy';
-import { WithTelemetry } from '../telementry/decorators';
-import { SDKLogger } from '../logger/logger';
-import { SdkConfig } from '../core/configs/sdkConfig';
-import { IVideoService } from '../core/interfaces/ICommon';
+import { BasePlayerStrategy } from '../../core/basePlayerStrategy';
+import { WithTelemetry } from '../../telementry/decorators';
+import { IVideoService } from '../../core/interfaces/ICommon';
 
 export class VideoJsStrategy extends BasePlayerStrategy {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   private videoPlayer!: videojs.Player;
-  private logger: SDKLogger;
   private playerConfig: any;
 
   constructor(playerConfig: any) {
     super();
-    this.logger = new SDKLogger(SdkConfig.getConfig().logLevel);
     this.playerConfig = playerConfig;
   }
 
   @WithTelemetry
-  init(videoElementId: string, provider: IVideoService): void {
-    this.videoElement = document.getElementById(videoElementId) as HTMLVideoElement;
+  createPlayer(videoElementId: string) {
+    this.logger.info(`Initializing with videoElementId: ${videoElementId}`);
+    this.videoElement = document.getElementById(videoElementId) as HTMLMediaElement;
 
     if (!this.videoElement) {
       this.logger.error(`Element with ID '${videoElementId}' not found.`);
@@ -29,6 +26,10 @@ export class VideoJsStrategy extends BasePlayerStrategy {
 
     this.videoPlayer = videojs(this.videoElement, this.playerConfig);
     this.logger.info(`VIDEOJS PlayerConfig:`, this.playerConfig);
+  }
+
+  @WithTelemetry
+  load(provider: IVideoService): void {
     this.videoPlayer.src({ src: provider.manifestUrl });
   }
 

@@ -1,11 +1,20 @@
+import { SdkConfig } from '../configs/sdkConfig';
+import { SDKLogger } from '../logger/logger';
 import { IPlayerStrategy, TimeUpdateEvent } from '../players/interfaces/IPlayers';
 import { IVideoService } from './interfaces/ICommon';
 
 export abstract class BasePlayerStrategy implements IPlayerStrategy {
   protected videoElement!: HTMLMediaElement;
   protected videoElementId!: string;
+  protected logger: SDKLogger;
 
-  abstract init(videoElementId: string, provider: IVideoService): void;
+  constructor() {
+    this.logger = new SDKLogger(SdkConfig.getConfig().logLevel);
+  }
+
+  abstract createPlayer(videoElementId: string): void;
+
+  abstract load(provider: IVideoService): void;
 
   onManifestAvailable(callback: (event: any) => void): void {
     // callback will be used in subclass implementations
@@ -29,6 +38,7 @@ export abstract class BasePlayerStrategy implements IPlayerStrategy {
 
   onLoadedMetadata(callback: (event: Event) => void): void {
     this.videoElement.addEventListener('loadedmetadata', (event) => {
+      this.logger.info(`loadedmetadata called:`, event);
       callback(event);
     });
   }

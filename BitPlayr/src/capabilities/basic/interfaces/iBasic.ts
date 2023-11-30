@@ -1,4 +1,4 @@
-import { IPlayerConfig } from '../../../core/configs/interfaces/IConfigs';
+import { IPlayerConfig } from '../../../configs/interfaces/IConfigs';
 import { EPlayerTypes } from '../../../core/interfaces/ICommon';
 
 export interface IBasicOptions {

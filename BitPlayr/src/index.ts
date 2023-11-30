@@ -15,6 +15,9 @@ export { MediatailorExtension } from './extensions/mediatailor/mediatailor';
 export { IPlayerExtension } from './extensions/interfaces/ICommon';
 export { IVideoService } from './core/interfaces/ICommon';
 
+// Helpers
+export { HFormatTime } from './utils/playback';
+
 // Base
 export { Player } from './core/basePlayer';
 export { BitPlayr } from './bitplayr';

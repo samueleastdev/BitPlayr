@@ -1,46 +1,70 @@
 #player-container {
   position: relative;
+  width: 1280px;
+  height: 720px;
+}
+
+#player-container video {
+  width: 100%;
+  height: 100%;
 }
 
 #control-bar {
   position: absolute;
   bottom: 0;
-  left: 0;
-  right: 0;
+  width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.7);
   padding: 10px;
+}
+
+.progress-bar {
+  height: 5px;
+  width: 100%;
+  cursor: pointer;
+  background-color: #555;
+}
+
+.progress {
+  height: 100%;
+  background-color: #2196F3;
+  width: 0%;
+}
+
+.control-bar-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.control-bar-buttons button {
+  padding: 5px 10px;
+  margin: 0 5px;
+  background-color: #333;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.control-bar-buttons button:hover {
+  background-color: #555;
 }
 
 .left-controls, .right-controls {
   display: flex;
+  align-items: center;
 }
 
-.progress-bar {
-  flex-grow: 1;
-  margin: 0 10px; /* Spacing between progress bar and buttons */
-  height: 5px;
-  background-color: #ddd;
-  cursor: pointer;
+/* TimeDisplay style (if needed) */
+#time-display {
+  color: white;
+  margin-left: 10px;
 }
 
-.progress {
-  width: 0;
-  height: 100%;
-  background-color: #666;
-}
-
-.control-button {
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.control-button:hover {
-  background-color: #e0e0e0;
+.ad-progress-bar {
+  position: absolute !important;
+  bottom: 20px !important;
+  left: 20px !important;
+  
 }

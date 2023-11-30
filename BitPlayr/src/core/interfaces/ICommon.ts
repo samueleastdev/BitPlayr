@@ -1,5 +1,5 @@
 import { IDeviceCapabilities } from '../../capabilities/interfaces/ICommon';
-import { ISdkConfig } from '../configs/interfaces/IConfigs';
+import { ISdkConfig } from '../../configs/interfaces/IConfigs';
 import { IPlayerExtension } from '../../extensions/interfaces/ICommon';
 
 export interface IVideoService {

@@ -3,7 +3,7 @@ import { supportsDashPlayback } from '../../utils/dash';
 import { supportsHlsPlayback } from '../../utils/hls';
 import { IDeviceCapabilities } from '../interfaces/ICommon';
 import { IBasicOptions } from './interfaces/IBasic';
-import { IPlayerConfig } from '../../core/configs/interfaces/IConfigs';
+import { IPlayerConfig } from '../../configs/interfaces/IConfigs';
 import { EPlayerTypes } from '../../core/interfaces/ICommon';
 
 export class BasicCapabilities implements IDeviceCapabilities {
@@ -16,16 +16,16 @@ export class BasicCapabilities implements IDeviceCapabilities {
 
   async determineStrategy(): Promise<IPlayerStrategy> {
     if (supportsHlsPlayback()) {
-      const { HlsJsStrategy } = await import('../../players/hlsjs');
+      const { HlsJsStrategy } = await import('../../players/hlsjs/hlsjs');
       return new HlsJsStrategy(this.playerConfig.hls);
     }
 
     if (supportsDashPlayback()) {
-      const { DashJsStrategy } = await import('../../players/dashjs');
+      const { DashJsStrategy } = await import('../../players/dashjs/dashjs');
       return new DashJsStrategy(this.playerConfig.dash);
     }
 
-    const { VideoJsStrategy } = await import('../../players/videojs');
+    const { VideoJsStrategy } = await import('../../players/videojs/videojs');
     return new VideoJsStrategy(this.playerConfig.videojs);
   }
 }
