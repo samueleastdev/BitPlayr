@@ -86,17 +86,16 @@ export class DashJsStrategy extends BasePlayerStrategy {
       if (selectedTrack) {
         this.player.setCurrentTrack(selectedTrack);
       } else {
-        console.log(`Selected ${track.type} track index exceeds available tracks`);
+        this.logger.info(`Selected ${track.type} track index exceeds available tracks`);
       }
     } else {
-      console.log(`Invalid track type: ${track.type}`);
+      this.logger.info(`Invalid track type: ${track.type}`);
     }
   }
 
   onQualityLevels(callback: (data: ILevelParsed[]) => void): void {
     this.player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
       const bitrates = this.player.getBitrateInfoListFor('video');
-      console.log('bitrates', bitrates);
       this.qualityLevels = bitrates.map((b) => ({
         index: b.qualityIndex,
         bitrate: b.bitrate,
@@ -110,7 +109,6 @@ export class DashJsStrategy extends BasePlayerStrategy {
 
   onQualityChange(callback: (event: ILevelParsed) => void): void {
     this.player.on(dashjs.MediaPlayer.events.QUALITY_CHANGE_RENDERED, (e) => {
-      console.log('QUALITY_CHANGE_RENDERED', e);
       if (e.mediaType === 'video') {
         const currentLevel = this.qualityLevels[e.newQuality];
         callback(currentLevel);

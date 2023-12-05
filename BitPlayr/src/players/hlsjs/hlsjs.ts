@@ -44,7 +44,7 @@ export class HlsJsStrategy extends BasePlayerStrategy {
 
   onManifestAvailable(callback: (data: any) => void): void {
     this.player.on(Hls.Events.MANIFEST_LOADED, (event, data) => {
-      console.log('data', data);
+      this.logger.info(`Manifest has been loaded:`, data);
       callback(data);
     });
   }
@@ -68,7 +68,7 @@ export class HlsJsStrategy extends BasePlayerStrategy {
 
   setTrack(track: ITrack) {
     if (!track.type || track.id == null) {
-      console.log(`Invalid track data: ${track}`);
+      this.logger.info(`Invalid track data: ${track}`);
       return;
     }
 
@@ -82,13 +82,12 @@ export class HlsJsStrategy extends BasePlayerStrategy {
         this.player.audioTrack = track.id;
         break;
       default:
-        console.log(`Invalid track type: ${track.type}`);
+        this.logger.info(`Invalid track type: ${track.type}`);
     }
   }
 
   onQualityLevels(callback: (data: ILevelParsed[]) => void): void {
     this.player.on(Hls.Events.MANIFEST_LOADED, (event, data) => {
-      console.log('data.levels', data.levels);
       this.qualityLevels = data.levels;
       callback(data.levels);
     });
@@ -109,7 +108,7 @@ export class HlsJsStrategy extends BasePlayerStrategy {
     if (matchedLevel !== -1) {
       this.player.currentLevel = matchedLevel;
     } else {
-      console.log('No match found');
+      this.logger.info(`setQuality match not found.`);
     }
   }
 
