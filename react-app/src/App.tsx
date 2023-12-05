@@ -1,11 +1,12 @@
 /*
   https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8
   https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd
+  https://media.axprod.net/TestVectors/v7-Clear/Manifest_1080p.mpd
   https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
 */
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { BitPlayr, ThumbnailsExtension, MediatailorExtension, BasicCapabilities, MediatailorService, LogLevel, IVideoService } from 'bitplayr';
+import { BitPlayr, ThumbnailsExtension, MediatailorExtension, BasicCapabilities, MediatailorService, LogLevel, IVideoService, BasicService, ITrack, ILevelParsed } from 'bitplayr';
 import TimeDisplay from './controls/TimeDisplay';
 import AdProgress from './controls/AdProgress';
 import ProgressBar from './controls/ProgressBar';
@@ -15,7 +16,13 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import Forward10Icon from '@mui/icons-material/Forward10';
+import Replay10Icon from '@mui/icons-material/Replay10'; 
 import IconButton from '@mui/material/IconButton';
+import SettingsIcon from '@mui/icons-material/Settings';
+import QualityLevels from './controls/QualityLevels';
+import SubtitleTracks from './controls/SubtitleTracks';
+import AudioTracks from './controls/AudioTracks';
 
 interface IPlayer {
   initialize(vp: IVideoService): unknown;
@@ -24,11 +31,14 @@ interface IPlayer {
   pause: () => void;
   fullscreen: () => void;
   seekTo: (time: number) => void;
+  setQuality(level: ILevelParsed): void;
+  setTrack(track: ITrack): void;
 }
 
 function App() {
   const videoElementId = 'video-element--sam';
   const bitPlayrRef = useRef<IPlayer | null>(null);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isAdPlaying, setIsAdPlaying] = useState(false);
   const [adBreaks, setAdBreaks] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -38,6 +48,10 @@ function App() {
   const [adTime, setAdTime] = useState(0);
   const [bufferedAhead, setBufferedAhead] = useState(0);
   const [bufferedBehind, setBufferedBehind] = useState(0);
+  const [qualityLevels, setQualityLevels] = useState<any[]>([]);
+  const [subtitleTracks, setSubtitleTracks] = useState<any[]>([]);
+  const [audioTracks, setAudioTracks] = useState<any[]>([]);
+
 
   useEffect(() => {
     const initializePlayer = async () => {
@@ -76,14 +90,19 @@ function App() {
         
         bitPlayrRef.current = await BitPlayr.createPlayer(videoElementId, playerOptions) as IPlayer;
 
+        /*
         // Fetch the video provider URL
         const vp = await BitPlayr.videoProvider(new MediatailorService({
           url: 'https://ad391cc0d55b44c6a86d232548adc225.mediatailor.us-east-1.amazonaws.com/v1/session/d02fedbbc5a68596164208dd24e9b48aa60dadc7/singssai/master.m3u8'
         }));
-        /*
+        */
+      
         const vp = await BitPlayr.videoProvider(new BasicService({
-          url: 'https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd'
-        }));*/
+          //url: 'https://media.axprod.net/TestVectors/v7-Clear/Manifest_1080p.mpd',
+          url: 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
+          //url: 'https://d1wkjvw8nof1jc.cloudfront.net/5fc11f81-4458-4632-a8a8-d9406cd27f14/master.m3u8',
+          //bif: 'https://d1wkjvw8nof1jc.cloudfront.net/5fc11f81-4458-4632-a8a8-d9406cd27f14/master.bif'
+        }));
 
         if (!vp) {
           throw new Error('Manifest URL not found');
@@ -112,6 +131,25 @@ function App() {
 
         bitPlayrRef.current.on('manifestAvailable', (event) => {
           
+        });
+
+        bitPlayrRef.current.on('qualitySwitch', (data) => {
+          console.log('qualitySwitch', data);
+        });
+
+        bitPlayrRef.current.on('qualityLevels', (data) => {
+          console.log('qualityLevels', data);
+          setQualityLevels(data);
+        });
+
+        bitPlayrRef.current.on('tracks', (data) => {
+          console.log('All Tracks', data);
+          setSubtitleTracks(data.subtitles);
+          setAudioTracks(data.audio);
+        });
+
+        bitPlayrRef.current.on('trackChanged', (data) => {
+          console.log('Track Change!!!', data);
         });
 
         bitPlayrRef.current.on('loadedmetadata', (event) => {
@@ -155,6 +193,10 @@ function App() {
     };
   }, [videoElementId]);
 
+  const toggleMenu = () => {
+    setIsMenuVisible(!isMenuVisible);
+  };
+
   const togglePlayPause = () => {
     if (bitPlayrRef.current) {
       if (isPlaying) {
@@ -189,15 +231,47 @@ function App() {
     }
   }
 
+  const skipForward = () => {
+      if (bitPlayrRef.current) {
+        bitPlayrRef.current.playerStrategy.videoElement.currentTime += 10; 
+      }
+  };
+
+  // Function to handle skip backward
+  const skipBackward = () => {
+      if (bitPlayrRef.current) {
+        bitPlayrRef.current.playerStrategy.videoElement.currentTime -= 10; 
+      }
+  };
+
   const handleSeek = (newTime) => {
     if (bitPlayrRef.current) {
       bitPlayrRef.current.seekTo(newTime);
     }
   };
 
+  const qualityChange = (level: ILevelParsed) => {
+    console.log('level',level);
+    if(bitPlayrRef.current){
+      bitPlayrRef.current?.setQuality(level);
+    }
+  };
+
+  const trackChanged = (track: ITrack) => {
+    if(bitPlayrRef.current){
+      bitPlayrRef.current?.setTrack(track);
+    }
+  };
+
   return (
     <div id='player-container'>
       <video width={1280} height={720} id={videoElementId}></video>
+      <div id="ttml-rendering-div" style={{ 
+          position: 'absolute', 
+          bottom: '10px', 
+          width: '100%', 
+          textAlign: 'center'
+      }}></div>
       <AdProgress adPercentage={percentage} adTime={adTime} isAdPlaying={isAdPlaying} />
       <div id='control-bar' style={{ display: isAdPlaying ? 'none' : 'flex' }}>
         <ProgressBar 
@@ -216,7 +290,25 @@ function App() {
             <IconButton onClick={restart} color="primary">
               <RestartAltIcon />
             </IconButton>
+            <IconButton onClick={skipBackward} color="primary">
+              <Replay10Icon />
+            </IconButton>
+            <IconButton onClick={skipForward} color="primary">
+              <Forward10Icon />
+            </IconButton>
             <TimeDisplay currentTime={currentTime} duration={duration} />
+            <div className="settings">
+              <IconButton id="settingsButton" color="primary" onClick={toggleMenu}>
+                <SettingsIcon />
+              </IconButton>
+              {isMenuVisible && (
+                <div className="menu" id="settingsMenu">
+                  <QualityLevels qualityLevels={qualityLevels} qualityChange={qualityChange} /> 
+                  <SubtitleTracks subtitleTracks={subtitleTracks} subtitleChanged={trackChanged} /> 
+                  <AudioTracks audioTracks={audioTracks} audioChanged={trackChanged} /> 
+                </div>
+              )}
+            </div>
           </div>
           <div className="right-controls">
             <IconButton onClick={fullscreen} color="primary">

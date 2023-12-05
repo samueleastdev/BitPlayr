@@ -95,3 +95,24 @@
 .MuiIconButton-root {
   border-radius: 0% !important;
 }
+
+.settings {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  bottom: 140%;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  width: 200px;
+  padding: 10px;
+}
+
+.menu select {
+  display: block; /* Make selects stack vertically */
+  width: 100%; /* Full width */
+  margin: 10px 0; /* Spacing */
+}

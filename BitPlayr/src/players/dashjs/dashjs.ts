@@ -1,15 +1,19 @@
-import dashjs from 'dashjs';
+import dashjs, { MediaInfo, MediaType } from 'dashjs';
 import { BasePlayerStrategy } from '../../core/basePlayerStrategy';
 import { WithTelemetry } from '../../telementry/decorators';
 import { IVideoService } from '../../core/interfaces/ICommon';
+import { ILevelParsed } from '../interfaces/IBitrates';
+import { DashJsTrackChangeEvent, ITrack, ITracks } from '../interfaces/ITracks';
 
 export class DashJsStrategy extends BasePlayerStrategy {
-  private dashPlayer!: dashjs.MediaPlayerClass;
+  private player!: dashjs.MediaPlayerClass;
   private playerConfig: any;
+  private qualityLevels: ILevelParsed[];
 
   constructor(playerConfig: any) {
     super();
     this.playerConfig = playerConfig;
+    this.qualityLevels = [];
   }
 
   @WithTelemetry
@@ -22,20 +26,112 @@ export class DashJsStrategy extends BasePlayerStrategy {
       throw new Error(`Element with ID '${videoElementId}' not found.`);
     }
 
-    this.dashPlayer = dashjs.MediaPlayer().create();
-    this.dashPlayer.updateSettings(this.playerConfig);
+    this.player = dashjs.MediaPlayer().create();
+    this.player.updateSettings(this.playerConfig);
     this.logger.info(`DASH PlayerConfig:`, this.playerConfig);
   }
 
   @WithTelemetry
   load(provider: IVideoService): void {
-    this.dashPlayer.initialize(this.videoElement, provider.manifestUrl, true);
+    this.player.initialize(this.videoElement, provider.manifestUrl, true);
+    const ttmlDiv = document.getElementById('ttml-rendering-div') as HTMLDivElement;
+    if (ttmlDiv) {
+      this.player.attachTTMLRenderingDiv(ttmlDiv);
+    }
   }
 
   onManifestAvailable(callback: (event: any) => void): void {
-    this.dashPlayer.on(dashjs.MediaPlayer.events.MANIFEST_LOADED, (e) => {
+    this.player.on(dashjs.MediaPlayer.events.MANIFEST_LOADED, (e) => {
       this.logger.info(`Manifest has been loaded:`, e.data);
       callback(e.data);
     });
+  }
+
+  onTracks(callback: (tracks: ITracks) => void): void {
+    this.player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+      const subtitles = this.player.getTracksFor('text').map(this.mapTrack);
+      const audio = this.player.getTracksFor('audio').map(this.mapTrack);
+
+      callback({ subtitles, audio });
+    });
+  }
+
+  onTrackChanged(callback: (data: ITrack) => void): void {
+    this.player.on(dashjs.MediaPlayer.events.TRACK_CHANGE_RENDERED, (e) => {
+      const event = e as unknown as DashJsTrackChangeEvent; // Type assertion
+      const track = event.newMediaInfo ?? undefined;
+
+      if (track) {
+        callback({
+          index: track.index,
+          type: track.type,
+          lang: track.lang,
+          roles: track.roles,
+          labels: track.labels,
+          codec: track.codec,
+          mimeType: track.mimeType,
+        });
+      }
+    });
+  }
+
+  setTrack(track: ITrack) {
+    const trackTypes = ['text', 'audio', 'video'];
+
+    if (track.type && trackTypes.includes(track.type)) {
+      const selectedTrack = this.player
+        .getTracksFor(track.type as MediaType)
+        .find((t) => t.index === track.index);
+
+      if (selectedTrack) {
+        this.player.setCurrentTrack(selectedTrack);
+      } else {
+        console.log(`Selected ${track.type} track index exceeds available tracks`);
+      }
+    } else {
+      console.log(`Invalid track type: ${track.type}`);
+    }
+  }
+
+  onQualityLevels(callback: (data: ILevelParsed[]) => void): void {
+    this.player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
+      const bitrates = this.player.getBitrateInfoListFor('video');
+      console.log('bitrates', bitrates);
+      this.qualityLevels = bitrates.map((b) => ({
+        index: b.qualityIndex,
+        bitrate: b.bitrate,
+        width: b.width,
+        height: b.height,
+        name: `${b.scanType} ${b.mediaType}`,
+      }));
+      callback(this.qualityLevels);
+    });
+  }
+
+  onQualityChange(callback: (event: ILevelParsed) => void): void {
+    this.player.on(dashjs.MediaPlayer.events.QUALITY_CHANGE_RENDERED, (e) => {
+      console.log('QUALITY_CHANGE_RENDERED', e);
+      if (e.mediaType === 'video') {
+        const currentLevel = this.qualityLevels[e.newQuality];
+        callback(currentLevel);
+      }
+    });
+  }
+
+  setQuality(level: ILevelParsed) {
+    console.log('setQuality!!!!@@@', level);
+    this.player.setQualityFor('video', 1);
+  }
+
+  private mapTrack(track: MediaInfo): ITrack {
+    return {
+      index: track.index,
+      type: track.type,
+      lang: track.lang,
+      roles: track.roles,
+      labels: track.labels,
+      codec: track.codec,
+      mimeType: track.mimeType,
+    };
   }
 }

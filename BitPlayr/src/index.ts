@@ -14,6 +14,8 @@ export { MediatailorExtension } from './extensions/mediatailor/mediatailor';
 // Interfaces
 export { IPlayerExtension } from './extensions/interfaces/ICommon';
 export { IVideoService } from './core/interfaces/ICommon';
+export { ITracks, ITrack } from './players/interfaces/ITracks';
+export { ILevelParsed } from './players/interfaces/IBitrates';
 
 // Helpers
 export { HFormatTime } from './utils/playback';
