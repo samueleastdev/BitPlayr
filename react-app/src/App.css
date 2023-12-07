@@ -112,7 +112,31 @@
 }
 
 .menu select {
-  display: block; /* Make selects stack vertically */
-  width: 100%; /* Full width */
-  margin: 10px 0; /* Spacing */
+  display: block; 
+  width: 100%; 
+  margin: 10px 0; 
+}
+
+.thumbnail-scrubber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 98%;
+  bottom: 60px;
+  background: #333333;
+  padding: 1%;
+}
+
+.thumbnail-scrubber img {
+  border: 1px solid white;
+}
+
+.main-thumbnail {
+  width: 200px; /* or your preferred size */
+}
+
+.side-thumbnail {
+  width: 100px; /* smaller than the main thumbnail */
+  opacity: 0.7; /* make side thumbnails a bit transparent */
 }

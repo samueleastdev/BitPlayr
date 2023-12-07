@@ -3,7 +3,7 @@ import { TimeUpdateEvent } from '../../players/interfaces/IPlayers';
 import { MediaTailorConfig } from '../../service/mediatailor/config/mediatailor';
 import { getUrl } from '../../utils/fetch';
 import { IPlayerExtension } from '../interfaces/ICommon';
-import { Ad, AdBreak, TrackingEvent } from './interfaces/IMediatailor';
+import { Ad, AdBreak } from './interfaces/IMediatailor';
 
 export class MediatailorExtension implements IPlayerExtension {
   private player: Player | null;

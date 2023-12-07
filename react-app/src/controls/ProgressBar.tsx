@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ProgressBar = ({ currentTime, duration, bufferedAhead, bufferedBehind, adBreaks, onSeek }) => {
+const ProgressBar = ({ currentTime, duration, bufferedAhead, bufferedBehind, adBreaks, onSeek, onBifImageDisplay, onHideBifImage  }) => {
   const progressBarRef = React.useRef(null);
 
   const renderAdBreaks = () => {
@@ -35,19 +35,28 @@ const ProgressBar = ({ currentTime, duration, bufferedAhead, bufferedBehind, adB
 
   function handleDragStart(e) {
     e.preventDefault();
+    updateBifImage(e);
     window.addEventListener('mousemove', handleDragging);
     window.addEventListener('mouseup', handleDragEnd);
   }
 
   function handleDragging(e) {
+    updateBifImage(e);
+  }
+
+  function updateBifImage(e) {
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const newTime = ((e.clientX - rect.left) / rect.width) * duration;
+    onBifImageDisplay(newTime, e.clientX - rect.left);
+  }
+
+  function handleDragEnd(e) {
     if (progressBarRef.current) {
       const rect = progressBarRef.current.getBoundingClientRect();
       const newTime = ((e.clientX - rect.left) / rect.width) * duration;
       onSeek(newTime); 
+      onHideBifImage();
     }
-  }
-
-  function handleDragEnd() {
     window.removeEventListener('mousemove', handleDragging);
     window.removeEventListener('mouseup', handleDragEnd);
   }

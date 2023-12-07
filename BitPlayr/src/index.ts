@@ -10,6 +10,7 @@ export { MediatailorService } from './service/mediatailor/mediatailor';
 // Extensions
 export { ThumbnailsExtension } from './extensions/thumbnails/thumbnails';
 export { MediatailorExtension } from './extensions/mediatailor/mediatailor';
+export { BifsExtension } from './extensions/bifs/bifs';
 
 // Interfaces
 export { IPlayerExtension } from './extensions/interfaces/ICommon';

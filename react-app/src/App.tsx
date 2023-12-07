@@ -6,7 +6,7 @@
 */
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { BitPlayr, ThumbnailsExtension, MediatailorExtension, BasicCapabilities, MediatailorService, LogLevel, IVideoService, BasicService, ITrack, ILevelParsed } from 'bitplayr';
+import { BitPlayr, ThumbnailsExtension, MediatailorExtension, BasicCapabilities, MediatailorService, LogLevel, IVideoService, BasicService, ITrack, ILevelParsed, BifsExtension } from 'bitplayr';
 import TimeDisplay from './controls/TimeDisplay';
 import AdProgress from './controls/AdProgress';
 import ProgressBar from './controls/ProgressBar';
@@ -23,6 +23,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import QualityLevels from './controls/QualityLevels';
 import SubtitleTracks from './controls/SubtitleTracks';
 import AudioTracks from './controls/AudioTracks';
+import BifScrubber from './controls/BifScrubber';
 
 interface IPlayer {
   initialize(vp: IVideoService): unknown;
@@ -36,8 +37,11 @@ interface IPlayer {
 }
 
 function App() {
-  const videoElementId = 'video-element--sam';
+  const videoElementId = 'video-element';
+  // useRef
   const bitPlayrRef = useRef<IPlayer | null>(null);
+  const bifsExtensionRef = useRef<BifsExtension | null>(null);
+  // useState
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isAdPlaying, setIsAdPlaying] = useState(false);
   const [adBreaks, setAdBreaks] = useState([]);
@@ -51,13 +55,20 @@ function App() {
   const [qualityLevels, setQualityLevels] = useState<any[]>([]);
   const [subtitleTracks, setSubtitleTracks] = useState<any[]>([]);
   const [audioTracks, setAudioTracks] = useState<any[]>([]);
-
+  const [mainThumbnail, setMainThumbnail] = useState('');
+  const [sideThumbnails, setSideThumbnails] = useState([]);
+  const [isBifScrubberVisible, setIsBifScrubberVisible] = useState(false)
 
   useEffect(() => {
     const initializePlayer = async () => {
+      const thumbnailsExtension = new ThumbnailsExtension();
+      const mediatailorExtension = new MediatailorExtension();
+      const bifsExtension = new BifsExtension();
+
+      bifsExtensionRef.current = bifsExtension;
 
       const playerOptions = {
-        extensions: [new ThumbnailsExtension(), new MediatailorExtension()],
+        extensions: [thumbnailsExtension, mediatailorExtension, bifsExtension],
         deviceCapabilities: new BasicCapabilities({ 
           default: 'hls.js', // dash.js | hls.js | video.js
           playerConfig: {
@@ -99,9 +110,9 @@ function App() {
       
         const vp = await BitPlayr.videoProvider(new BasicService({
           //url: 'https://media.axprod.net/TestVectors/v7-Clear/Manifest_1080p.mpd',
-          url: 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
-          //url: 'https://d1wkjvw8nof1jc.cloudfront.net/5fc11f81-4458-4632-a8a8-d9406cd27f14/master.m3u8',
-          //bif: 'https://d1wkjvw8nof1jc.cloudfront.net/5fc11f81-4458-4632-a8a8-d9406cd27f14/master.bif'
+          //url: 'https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8',
+          url: 'https://d1wkjvw8nof1jc.cloudfront.net/5fc11f81-4458-4632-a8a8-d9406cd27f14/master.m3u8',
+          bif: 'https://d1wkjvw8nof1jc.cloudfront.net/5fc11f81-4458-4632-a8a8-d9406cd27f14/master.bif'
         }));
 
         if (!vp) {
@@ -251,7 +262,6 @@ function App() {
   };
 
   const qualityChange = (level: ILevelParsed) => {
-    console.log('level',level);
     if(bitPlayrRef.current){
       bitPlayrRef.current?.setQuality(level);
     }
@@ -263,9 +273,52 @@ function App() {
     }
   };
 
+  const handleBifImageDisplay = (newTime) => {
+    const interval = 5; // seconds
+    const numOfThumbnailsEachSide = 2; // How many thumbnails you want on each side
+    
+    if (bifsExtensionRef.current) {
+      try {
+
+        setIsBifScrubberVisible(true);
+
+        let sideThumbnailsData = [];
+
+        for (let i = numOfThumbnailsEachSide; i > 0; i--) {
+          const time = Math.max(0, newTime - interval * i);
+          const thumbnailData = bifsExtensionRef.current.getImageAtSecond(time);
+          sideThumbnailsData.push(thumbnailData);
+        }
+  
+        const mainThumbnailData = bifsExtensionRef.current.getImageAtSecond(newTime);
+        sideThumbnailsData.push(mainThumbnailData);
+  
+        for (let i = 1; i <= numOfThumbnailsEachSide; i++) {
+          const time = newTime + interval * i;
+          const thumbnailData = bifsExtensionRef.current.getImageAtSecond(time);
+          sideThumbnailsData.push(thumbnailData);
+        }
+  
+        setMainThumbnail(mainThumbnailData);
+        setSideThumbnails(sideThumbnailsData);
+        
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+  };
+  
+  
+  const hideBifImage = () => {
+    setIsBifScrubberVisible(false);
+  };
+
   return (
-    <div id='player-container'>
+    <div id='player-container'>  
       <video width={1280} height={720} id={videoElementId}></video>
+      {isBifScrubberVisible && (
+        <BifScrubber mainThumbnail={mainThumbnail} sideThumbnails={sideThumbnails} />
+      )}
       <div id="ttml-rendering-div" style={{ 
           position: 'absolute', 
           bottom: '10px', 
@@ -281,6 +334,8 @@ function App() {
           bufferedBehind={bufferedBehind}
           adBreaks={adBreaks}
           onSeek={handleSeek} 
+          onBifImageDisplay={handleBifImageDisplay}
+          onHideBifImage={hideBifImage}
         />
         <div className='control-bar-buttons'>
           <div className="left-controls">
@@ -297,6 +352,8 @@ function App() {
               <Forward10Icon />
             </IconButton>
             <TimeDisplay currentTime={currentTime} duration={duration} />
+          </div>
+          <div className="right-controls">
             <div className="settings">
               <IconButton id="settingsButton" color="primary" onClick={toggleMenu}>
                 <SettingsIcon />
@@ -309,8 +366,6 @@ function App() {
                 </div>
               )}
             </div>
-          </div>
-          <div className="right-controls">
             <IconButton onClick={fullscreen} color="primary">
               <FullscreenIcon />
             </IconButton>
