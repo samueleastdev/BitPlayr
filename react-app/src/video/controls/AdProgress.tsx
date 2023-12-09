@@ -7,7 +7,6 @@ const AdProgress = ({ adPercentage, adTime, isAdPlaying }) => {
   let progressBar;
 
   useEffect(() => {
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
     progressBar = new ProgressBar.Circle(containerRef.current, {
       strokeWidth: 8,
@@ -17,7 +16,7 @@ const AdProgress = ({ adPercentage, adTime, isAdPlaying }) => {
       easing: 'easeInOut',
       svgStyle: null,
       fill: 'rgba(0, 0, 0)',
-      duration: 1000,  
+      duration: 1000,
     });
 
     progressBar.set(adPercentage);
@@ -26,13 +25,16 @@ const AdProgress = ({ adPercentage, adTime, isAdPlaying }) => {
     progressBarRef.current = progressBar;
 
     return () => {
-      
       progressBar.destroy();
     };
   }, [adPercentage]);
 
   return (
-    <div className='ad-progress-bar' ref={containerRef} style={{ display: isAdPlaying ? 'block' : 'none', width: '60px', height: '60px' }}>
+    <div
+      className="ad-progress-bar"
+      ref={containerRef}
+      style={{ display: isAdPlaying ? 'block' : 'none', width: '60px', height: '60px' }}
+    >
       {/* The progress bar will be rendered here */}
     </div>
   );

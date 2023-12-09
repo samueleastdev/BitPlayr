@@ -22,7 +22,6 @@ export class BifsExtension implements IPlayerExtension {
       const bifData = BasicConfig.getConfig().bifData;
       if (bifData instanceof ArrayBuffer) {
         this.BIFParser = new BIFParser(bifData);
-        console.log('this.BIFParser', this.BIFParser);
       } else if (bifData != null) {
         throw new Error('Invalid BIF data.');
       }

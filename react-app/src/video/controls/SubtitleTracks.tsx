@@ -2,26 +2,29 @@ import { ITrack } from 'bitplayr';
 import React from 'react';
 
 interface ISubtitleProps {
-    subtitleTracks: ITrack[];
-    subtitleChanged: (track: ITrack) => void;
+  subtitleTracks: ITrack[];
+  subtitleChanged: (track: ITrack) => void;
 }
 
 const SubtitleTracks: React.FC<ISubtitleProps> = ({ subtitleTracks, subtitleChanged }) => {
-    const handleTrackChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const track = subtitleTracks[parseInt(event.target.value)];
-        subtitleChanged(track);
-    };
+  const handleTrackChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const track = subtitleTracks[parseInt(event.target.value)];
+    subtitleChanged(track);
+  };
 
-    return (
-        <><label>Subtitles</label><select onChange={handleTrackChange}>
-        <option value="-1">None</option> 
+  return (
+    <>
+      <label>Subtitles</label>
+      <select onChange={handleTrackChange}>
+        <option value="-1">None</option>
         {subtitleTracks.map((track, index) => (
           <option key={index} value={index}>
             {`${track.id ?? track.index} ${track.name ?? track.lang} ${track.codec ?? ''}`}
           </option>
         ))}
-      </select></>
-    );
+      </select>
+    </>
+  );
 };
 
 export default SubtitleTracks;
