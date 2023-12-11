@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { IPlayerStrategy } from '../players/interfaces/IPlayers';
 import { IVideoService } from './interfaces/ICommon';
 import { ITrack } from '../players/interfaces/ITracks';
-import { ILevelParsed } from '../players/interfaces/IBitrates';
+import { IQualityLevel } from '../players/interfaces/IBitrates';
 
 export class Player extends EventEmitter {
   private playerStrategy: IPlayerStrategy;
@@ -54,7 +54,7 @@ export class Player extends EventEmitter {
     this.playerStrategy.seekTo(time);
   }
 
-  setQuality(level: ILevelParsed) {
+  setQuality(level: IQualityLevel) {
     this.playerStrategy.setQuality(level);
   }
 

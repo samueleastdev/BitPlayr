@@ -2,17 +2,20 @@ import dashjs, { MediaInfo, MediaType } from 'dashjs';
 import { BasePlayerStrategy } from '../../core/basePlayerStrategy';
 import { WithTelemetry } from '../../telementry/decorators';
 import { IVideoService } from '../../core/interfaces/ICommon';
-import { ILevelParsed } from '../interfaces/IBitrates';
+import { IQualityLevel } from '../interfaces/IBitrates';
 import { DashJsTrackChangeEvent, ITrack, ITracks } from '../interfaces/ITracks';
+import { IConfig, IGlobalConfig } from '../../configs/interfaces/IConfigs';
 
 export class DashJsStrategy extends BasePlayerStrategy {
   private player!: dashjs.MediaPlayerClass;
   private playerConfig: any;
-  private qualityLevels: ILevelParsed[];
+  private globalConfig: IGlobalConfig;
+  private qualityLevels: IQualityLevel[];
 
-  constructor(playerConfig: any) {
+  constructor(config: IConfig) {
     super();
-    this.playerConfig = playerConfig;
+    this.playerConfig = config.dash;
+    this.globalConfig = config.global;
     this.qualityLevels = [];
   }
 
@@ -93,7 +96,7 @@ export class DashJsStrategy extends BasePlayerStrategy {
     }
   }
 
-  onQualityLevels(callback: (data: ILevelParsed[]) => void): void {
+  onQualityLevels(callback: (data: IQualityLevel[]) => void): void {
     this.player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
       const bitrates = this.player.getBitrateInfoListFor('video');
       this.qualityLevels = bitrates.map((b) => ({
@@ -107,7 +110,7 @@ export class DashJsStrategy extends BasePlayerStrategy {
     });
   }
 
-  onQualityChange(callback: (event: ILevelParsed) => void): void {
+  onQualityChange(callback: (event: IQualityLevel) => void): void {
     this.player.on(dashjs.MediaPlayer.events.QUALITY_CHANGE_RENDERED, (e) => {
       if (e.mediaType === 'video') {
         const currentLevel = this.qualityLevels[e.newQuality];
@@ -116,7 +119,7 @@ export class DashJsStrategy extends BasePlayerStrategy {
     });
   }
 
-  setQuality(level: ILevelParsed) {
+  setQuality(level: IQualityLevel) {
     console.log('setQuality!!!!@@@', level);
     this.player.setQualityFor('video', 1);
   }

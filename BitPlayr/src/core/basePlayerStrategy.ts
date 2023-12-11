@@ -1,6 +1,6 @@
 import { SdkConfig } from '../configs/sdkConfig';
 import { SDKLogger } from '../logger/logger';
-import { ILevelParsed } from '../players/interfaces/IBitrates';
+import { IQualityLevel } from '../players/interfaces/IBitrates';
 import { IPlayerStrategy, TimeUpdateEvent } from '../players/interfaces/IPlayers';
 import { ITrack } from '../players/interfaces/ITracks';
 import { IVideoService } from './interfaces/ICommon';
@@ -13,7 +13,12 @@ export abstract class BasePlayerStrategy implements IPlayerStrategy {
   constructor() {
     this.logger = new SDKLogger(SdkConfig.getConfig().logLevel);
   }
-  setQuality(level: ILevelParsed): void {
+
+  abstract createPlayer(videoElementId: string): void;
+
+  abstract load(provider: IVideoService): void;
+
+  setQuality(level: IQualityLevel): void {
     throw new Error('Method not implemented.');
   }
 
@@ -28,10 +33,6 @@ export abstract class BasePlayerStrategy implements IPlayerStrategy {
   onTrackChanged(callback: (data: any) => void): void {
     throw new Error('Method not implemented.');
   }
-
-  abstract createPlayer(videoElementId: string): void;
-
-  abstract load(provider: IVideoService): void;
 
   onManifestAvailable(callback: (event: any) => void): void {
     // callback will be used in subclass implementations

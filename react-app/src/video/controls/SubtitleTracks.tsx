@@ -17,11 +17,13 @@ const SubtitleTracks: React.FC<ISubtitleProps> = ({ subtitleTracks, subtitleChan
       <label>Subtitles</label>
       <select onChange={handleTrackChange}>
         <option value="-1">None</option>
-        {subtitleTracks.map((track, index) => (
-          <option key={index} value={index}>
-            {`${track.id ?? track.index} ${track.name ?? track.lang} ${track.codec ?? ''}`}
-          </option>
-        ))}
+        {subtitleTracks &&
+          subtitleTracks.length > 0 &&
+          subtitleTracks.map((track, index) => (
+            <option key={index} value={index}>
+              {`${track.id ?? track.index} ${track.name ?? track.lang} ${track.codec ?? ''}`}
+            </option>
+          ))}
       </select>
     </>
   );

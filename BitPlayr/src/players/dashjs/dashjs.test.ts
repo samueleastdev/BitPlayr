@@ -23,7 +23,10 @@ describe('DashJsStrategy', () => {
     SdkConfig.setConfig({
       telemetryEnabled: false,
     });
-    dashJsStrategy = new DashJsStrategy({});
+    dashJsStrategy = new DashJsStrategy({
+      global: {},
+      dash: {},
+    });
     jest.spyOn(document, 'getElementById').mockImplementation((id: string) => {
       if (id === 'test-video-element') {
         return mockVideoElement as any;

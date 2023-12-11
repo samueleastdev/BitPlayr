@@ -1,6 +1,6 @@
 export interface ITracks {
-  subtitles: ITrack[];
-  audio: ITrack[];
+  subtitles?: ITrack[];
+  audio?: ITrack[];
 }
 
 export interface ITrack {

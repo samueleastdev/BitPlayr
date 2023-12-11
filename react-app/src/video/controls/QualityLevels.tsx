@@ -1,9 +1,9 @@
-import { ILevelParsed } from 'bitplayr';
+import { IQualityLevel } from 'bitplayr';
 import React from 'react';
 
 interface IQualityLevelsProps {
-  qualityLevels: ILevelParsed[];
-  qualityChange: (level: ILevelParsed) => void;
+  qualityLevels: IQualityLevel[];
+  qualityChange: (level: IQualityLevel) => void;
 }
 
 const QualityLevels: React.FC<IQualityLevelsProps> = ({ qualityLevels, qualityChange }) => {
@@ -19,7 +19,7 @@ const QualityLevels: React.FC<IQualityLevelsProps> = ({ qualityLevels, qualityCh
         <option value="-1">None</option>
         {qualityLevels.map((quality, index) => (
           <option key={index} value={index}>
-            {`${quality.bitrate} kbps (${quality.width}x${quality.height})`}
+            {`${quality.bitrate + ' kbps' ?? ''} (${quality.width}x${quality.height})`}
           </option>
         ))}
       </select>

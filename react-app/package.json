@@ -25,7 +25,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "reset": "rm -rf node_modules package-lock.json && npm install && npm link bitplayr"
   },
   "eslintConfig": {
     "extends": [

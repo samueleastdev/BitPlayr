@@ -16,7 +16,7 @@ import {
   IVideoService,
   BasicService,
   ITrack,
-  ILevelParsed,
+  IQualityLevel,
   BifsExtension,
 } from 'bitplayr';
 import TimeDisplay from './controls/TimeDisplay';
@@ -49,7 +49,7 @@ interface IPlayer {
   pause: () => void;
   fullscreen: () => void;
   seekTo: (time: number) => void;
-  setQuality(level: ILevelParsed): void;
+  setQuality(level: IQualityLevel): void;
   setTrack(track: ITrack): void;
 }
 
@@ -92,8 +92,11 @@ function Bitplayr() {
         extensions: [thumbnailsExtension, mediatailorExtension, bifsExtension],
         deviceCapabilities: new BasicCapabilities({
           default: 'hls.js', // dash.js | hls.js | video.js
-          playerConfig: {
-            videojs: {},
+          config: {
+            global: {
+              startTime: 25,
+              preferredLanguage: 'en',
+            },
             dash: {
               streaming: {
                 abr: {
@@ -109,6 +112,27 @@ function Bitplayr() {
             },
             hls: {
               autoplay: true,
+            },
+            shaka: {
+              // Streaming configurations
+              streaming: {
+                // Sets the rebuffering goal in seconds. The player will buffer this much
+                // content before resuming playback after a buffer underrun.
+                rebufferingGoal: 2,
+
+                // Sets the buffering goal in seconds. The player will try to keep this
+                // much content buffered ahead of the playhead. This value must be
+                // greater than or equal to the rebuffering goal.
+                bufferingGoal: 10,
+
+                // Sets the number of seconds of content that the streaming engine will
+                // try to keep buffered ahead of the playhead when it is forced to buffer
+                // in low bandwidth situations.
+                bufferBehind: 30,
+
+                // Whether to ignore text stream adaptation set by the abr manager.
+                ignoreTextStreamFailures: true,
+              },
             },
           },
         }),
@@ -262,7 +286,7 @@ function Bitplayr() {
     }
   };
 
-  const qualityChange = (level: ILevelParsed) => {
+  const qualityChange = (level: IQualityLevel) => {
     if (bitPlayrRef.current) {
       bitPlayrRef.current?.setQuality(level);
     }

@@ -11,14 +11,11 @@ export class BitPlayr {
 
   static async createPlayer(videoElementId: string, config: IGlobalConfig): Promise<Player> {
     SdkConfig.setConfig(config.sdkConfig);
-
     const strategy = await config.deviceCapabilities.determineStrategy();
     const player = new Player(strategy, videoElementId);
-
     config.extensions.forEach((extension) => {
       extension.apply(player);
     });
-
     return player;
   }
 }

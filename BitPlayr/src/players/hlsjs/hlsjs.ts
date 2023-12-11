@@ -2,19 +2,22 @@ import Hls, { MediaPlaylist } from 'hls.js';
 import { BasePlayerStrategy } from '../../core/basePlayerStrategy';
 import { WithTelemetry } from '../../telementry/decorators';
 import { IVideoService } from '../../core/interfaces/ICommon';
-import { ILevelParsed } from '../interfaces/IBitrates';
+import { IQualityLevel } from '../interfaces/IBitrates';
 import { ITrack, ITracks } from '../interfaces/ITracks';
+import { IConfig, IGlobalConfig } from '../../configs/interfaces/IConfigs';
 
 export class HlsJsStrategy extends BasePlayerStrategy {
   private player!: Hls;
   private playerConfig: any;
+  private globalConfig: IGlobalConfig;
   private audioTracks: ITrack[];
   private subtitleTracks: ITrack[];
-  private qualityLevels: ILevelParsed[];
+  private qualityLevels: IQualityLevel[];
 
-  constructor(playerConfig: any) {
+  constructor(config: IConfig) {
     super();
-    this.playerConfig = playerConfig;
+    this.playerConfig = config.hls;
+    this.globalConfig = config.global;
     this.audioTracks = [];
     this.subtitleTracks = [];
     this.qualityLevels = [];
@@ -86,21 +89,21 @@ export class HlsJsStrategy extends BasePlayerStrategy {
     }
   }
 
-  onQualityLevels(callback: (data: ILevelParsed[]) => void): void {
+  onQualityLevels(callback: (data: IQualityLevel[]) => void): void {
     this.player.on(Hls.Events.MANIFEST_LOADED, (event, data) => {
       this.qualityLevels = data.levels;
       callback(data.levels);
     });
   }
 
-  onQualityChange(callback: (data: ILevelParsed) => void): void {
+  onQualityChange(callback: (data: IQualityLevel) => void): void {
     this.player.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
       const currentLevel = this.qualityLevels[data.level];
       callback(currentLevel);
     });
   }
 
-  setQuality(level: ILevelParsed) {
+  setQuality(level: IQualityLevel) {
     const matchedLevel = this.qualityLevels.findIndex(
       (track) => track.width === level.width && track.height === level.height,
     );

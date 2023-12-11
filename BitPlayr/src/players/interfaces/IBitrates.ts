@@ -1,4 +1,4 @@
-export declare interface ILevelParsed {
+export declare interface IQualityLevel {
   index?: number;
   audioCodec?: string;
   bitrate: number;

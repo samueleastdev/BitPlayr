@@ -4,20 +4,22 @@ import { BasicConfig } from './config/basic';
 // BasicService implementation
 export class BasicService implements IService {
   private url: string;
-  private bif: string;
+  private bif?: string;
 
-  constructor(options: { url: string; bif: string }) {
+  constructor(options: { url: string; bif?: string }) {
     this.url = options.url;
     this.bif = options.bif;
   }
 
   async getUrl(): Promise<string> {
-    const bifData = await this.getBifData();
-    console.log('bifData', bifData);
+    await this.getBifData();
     return this.url;
   }
 
   async getBifData() {
+    if (!this.bif) {
+      return;
+    }
     try {
       const response = await fetch(this.bif, {
         method: 'GET',

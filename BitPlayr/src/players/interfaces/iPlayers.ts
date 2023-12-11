@@ -1,6 +1,6 @@
 import { IVideoService } from '../../core/interfaces/ICommon';
 import { IPlayerExtension } from '../../extensions/interfaces/ICommon';
-import { ILevelParsed } from './IBitrates';
+import { IQualityLevel } from './IBitrates';
 import { ITrack, ITracks } from './ITracks';
 
 export interface TimeUpdateEvent {
@@ -15,9 +15,9 @@ export interface IPlayerStrategy {
   onTimeUpdate(callback: (event: TimeUpdateEvent) => void): void;
   onSeeked(callback: (time: number) => void): void;
   onManifestAvailable(callback: (data: any) => void): void;
-  onQualityLevels(callback: (data: ILevelParsed[]) => void): void;
-  onQualityChange(callback: (data: ILevelParsed) => void): void;
-  setQuality(level: ILevelParsed): void;
+  onQualityLevels(callback: (data: IQualityLevel[]) => void): void;
+  onQualityChange(callback: (data: IQualityLevel) => void): void;
+  setQuality(level: IQualityLevel): void;
   onTracks(callback: (tracks: ITracks) => void): void;
   onTrackChanged(callback: (track: ITrack) => void): void;
   setTrack(track: ITrack): void;

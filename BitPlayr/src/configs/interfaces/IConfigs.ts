@@ -5,8 +5,15 @@ export interface ISdkConfig {
   telemetryEnabled?: boolean;
 }
 
-export interface IPlayerConfig {
-  videojs: any;
-  hls: any;
-  dash: any;
+export interface IGlobalConfig {
+  autoplay?: boolean;
+  startTime?: number;
+  preferredLanguage?: string;
+}
+
+export interface IConfig {
+  global: IGlobalConfig;
+  hls?: any;
+  dash?: any;
+  shaka?: any;
 }

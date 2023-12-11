@@ -1,5 +1,5 @@
 import { SdkConfig } from '../configs/sdkConfig';
-import { SDKLogger } from '../logger/logger';
+import { LogLevel, SDKLogger } from '../logger/logger';
 
 export function WithTelemetry(
   target: Object,
@@ -7,7 +7,7 @@ export function WithTelemetry(
   descriptor: PropertyDescriptor,
 ): PropertyDescriptor {
   const originalMethod = descriptor.value;
-  const logger = new SDKLogger(SdkConfig.getConfig().logLevel);
+  const logger = new SDKLogger(LogLevel.TELEMENTRY);
 
   descriptor.value = function (...args: any[]) {
     if (!SdkConfig.getConfig().telemetryEnabled) {

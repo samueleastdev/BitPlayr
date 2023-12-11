@@ -16,7 +16,7 @@ export { BifsExtension } from './extensions/bifs/bifs';
 export { IPlayerExtension } from './extensions/interfaces/ICommon';
 export { IVideoService } from './core/interfaces/ICommon';
 export { ITracks, ITrack } from './players/interfaces/ITracks';
-export { ILevelParsed } from './players/interfaces/IBitrates';
+export { IQualityLevel } from './players/interfaces/IBitrates';
 
 // Helpers
 export { HFormatTime } from './utils/playback';
