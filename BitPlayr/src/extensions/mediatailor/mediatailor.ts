@@ -1,12 +1,12 @@
-import { Player } from '../../core/basePlayer';
-import { TimeUpdateEvent } from '../../players/interfaces/IPlayers';
+import { BasePlayer } from '../../player/base/BasePlayer';
+import { TimeUpdateEvent } from '../../player/common/ICommon';
 import { MediaTailorConfig } from '../../service/mediatailor/config/mediatailor';
 import { getUrl } from '../../utils/fetch';
 import { IPlayerExtension } from '../interfaces/ICommon';
 import { Ad, AdBreak } from './interfaces/IMediatailor';
 
 export class MediatailorExtension implements IPlayerExtension {
-  private player: Player | null;
+  private player: BasePlayer | null;
   private adBreak: AdBreak[];
 
   constructor() {
@@ -16,7 +16,7 @@ export class MediatailorExtension implements IPlayerExtension {
     this.handleTimeupdate = this.handleTimeupdate.bind(this);
   }
 
-  apply(player: Player) {
+  apply(player: BasePlayer) {
     this.player = player;
     player.on('loadedmetadata', this.handleLoadedMetadata);
     player.on('timeupdate', this.handleTimeupdate);

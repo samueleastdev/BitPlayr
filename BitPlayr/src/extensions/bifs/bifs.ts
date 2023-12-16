@@ -1,10 +1,10 @@
-import { Player } from '../../core/basePlayer';
+import { BasePlayer } from '../../player/base/BasePlayer';
 import { BasicConfig } from '../../service/basic/config/basic';
 import { IPlayerExtension } from '../interfaces/ICommon';
 import { BIFParser } from './parser';
 
 export class BifsExtension implements IPlayerExtension {
-  private player: Player | null;
+  private player: BasePlayer | null;
   BIFParser?: BIFParser;
 
   constructor() {
@@ -12,8 +12,9 @@ export class BifsExtension implements IPlayerExtension {
     this.handleLoadedMetadata = this.handleLoadedMetadata.bind(this);
   }
 
-  apply(player: Player) {
+  apply(player: BasePlayer) {
     this.player = player;
+    console.log('DEVICE INFO: ', this.player.getDeviceInfo());
     player.on('loadedmetadata', this.handleLoadedMetadata);
   }
 

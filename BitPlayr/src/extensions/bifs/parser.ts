@@ -93,6 +93,6 @@ export class BIFParser {
       ),
     );
 
-    return `${image}${base64}`;
+    return base64 ? `${image}${base64}` : '';
   }
 }

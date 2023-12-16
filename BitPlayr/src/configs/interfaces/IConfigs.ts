@@ -1,3 +1,4 @@
+import { IPlayerExtension } from '../../extensions/interfaces/ICommon';
 import { LogLevel } from '../../logger/logger';
 
 export interface ISdkConfig {
@@ -5,15 +6,21 @@ export interface ISdkConfig {
   telemetryEnabled?: boolean;
 }
 
-export interface IGlobalConfig {
+export interface IGlobalPlayerConfig {
   autoplay?: boolean;
   startTime?: number;
   preferredLanguage?: string;
 }
 
-export interface IConfig {
-  global: IGlobalConfig;
+export interface IPlayerConfig {
+  global: IGlobalPlayerConfig;
   hls?: any;
   dash?: any;
   shaka?: any;
+}
+
+export interface IGlobalConfig {
+  extensions: IPlayerExtension[];
+  playerConfig: IPlayerConfig;
+  sdkConfig: ISdkConfig;
 }

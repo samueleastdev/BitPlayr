@@ -1,5 +1,5 @@
-import { Player } from '../../core/basePlayer';
+import { BasePlayer } from '../../player/base/BasePlayer';
 
 export interface IPlayerExtension {
-  apply(player: Player): void;
+  apply(player: BasePlayer): void;
 }

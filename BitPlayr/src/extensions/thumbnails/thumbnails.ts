@@ -1,8 +1,8 @@
-import { Player } from '../../core/basePlayer';
+import { BasePlayer } from '../../player/base/BasePlayer';
 import { IPlayerExtension } from '../interfaces/ICommon';
 
 export class ThumbnailsExtension implements IPlayerExtension {
-  apply(player: Player) {
+  apply(player: BasePlayer) {
     player.on('timeupdate', this.handleTimeUpdate);
   }
 

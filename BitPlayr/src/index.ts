@@ -1,7 +1,6 @@
 export { LogLevel } from './logger/logger';
 
 // Capabilities
-export { BasicCapabilities } from './capabilities/basic/basic';
 export { BasicService } from './service/basic/basic';
 
 // Services
@@ -14,13 +13,12 @@ export { BifsExtension } from './extensions/bifs/bifs';
 
 // Interfaces
 export { IPlayerExtension } from './extensions/interfaces/ICommon';
-export { IVideoService } from './core/interfaces/ICommon';
-export { ITracks, ITrack } from './players/interfaces/ITracks';
-export { IQualityLevel } from './players/interfaces/IBitrates';
+export { IVideoService } from './service/interfaces/ICommon';
+export { ITracks, ITrack, IQualityLevel } from './player/interfaces/ITracks';
 
 // Helpers
 export { HFormatTime } from './utils/playback';
 
 // Base
-export { Player } from './core/basePlayer';
+export { BasePlayer } from './player/base/BasePlayer';
 export { BitPlayr } from './bitplayr';
