@@ -1,10 +1,11 @@
 import dashjs, { MediaInfo, MediaType } from 'dashjs';
-import { BasePlayer } from '../base/BasePlayer';
-import { IDeviceDetails } from '../../device/common/ICommon';
-import { IPlayerConfig } from '../../configs/interfaces/IConfigs';
+import { BasePlayer } from '../base/base-player';
+import { IDeviceDetails } from '../../device/common/common';
+import { IPlayerConfig } from '../../configs/interfaces/configs';
 import { WithTelemetry } from '../../telementry/decorators';
-import { IQualityLevel, ITrack } from '../interfaces/ITracks';
-import { IVideoService } from '../../service/interfaces/ICommon';
+import { IQualityLevel, ITrack } from '../interfaces/tracks';
+import { IVideoService } from '../../service/interfaces/common';
+import { VideoEvents } from '../common/common';
 
 export class DashPlayer extends BasePlayer {
   private player!: dashjs.MediaPlayerClass;
@@ -30,8 +31,11 @@ export class DashPlayer extends BasePlayer {
     this.player = dashjs.MediaPlayer().create();
     this.player.updateSettings(this.playerConfig.dash);
     this.logger.info(`DASH PlayerConfig:`, this.playerConfig.dash);
-    this.videoElement.addEventListener('loadedmetadata', this.emit.bind(this, 'loadedmetadata'));
-    this.videoElement.addEventListener('timeupdate', this.emit.bind(this, 'timeupdate'));
+
+    Object.values(VideoEvents).forEach((event: VideoEvents) => {
+      this.videoElement.addEventListener(event, this.emit.bind(this, event));
+    });
+
     this.player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, this.getQualityLevels.bind(this));
     this.player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, this.getTracks.bind(this));
   }

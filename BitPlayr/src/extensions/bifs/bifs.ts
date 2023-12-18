@@ -1,6 +1,6 @@
-import { BasePlayer } from '../../player/base/BasePlayer';
+import { BasePlayer } from '../../player/base/base-player';
 import { BasicConfig } from '../../service/basic/config/basic';
-import { IPlayerExtension } from '../interfaces/ICommon';
+import { IPlayerExtension } from '../interfaces/common';
 import { BIFParser } from './parser';
 
 export class BifsExtension implements IPlayerExtension {

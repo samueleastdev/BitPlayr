@@ -1,5 +1,14 @@
 ## Common Media Player API
 
+# Features
+- Mediatailor SSAI 
+- Multiple Player Support HLS.js DASH.js Shaka Player
+- Netflix Style Thumbnails
+- Works on Tizen Samsung TVs
+- Quality Switching
+- Subtitles
+- Audio Tracks
+
 ### Setup
 
 cd into BitPlayr SDK and run
@@ -7,7 +16,7 @@ cd into BitPlayr SDK and run
 npm link
 ~~~
 
-cd into react-app and run
+cd into React and run
 ~~~sh
 npm link bitplayr
 ~~~

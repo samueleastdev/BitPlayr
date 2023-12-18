@@ -19,6 +19,7 @@ import {
   IQualityLevel,
   BifsExtension,
   BasePlayer,
+  GoogleAnalyticsExtension,
 } from 'bitplayr';
 import TimeDisplay from './controls/TimeDisplay';
 import AdProgress from './controls/AdProgress';
@@ -75,12 +76,13 @@ function BitPlayrVideo() {
     const initializePlayer = async () => {
       const thumbnailsExtension = new ThumbnailsExtension();
       const mediatailorExtension = new MediatailorExtension();
+
       const bifsExtension = new BifsExtension();
 
       bifsExtensionRef.current = bifsExtension;
 
       const playerOptions = {
-        extensions: [bifsExtension],
+        extensions: [bifsExtension, new GoogleAnalyticsExtension()],
         playerConfig: {
           global: {
             startTime: 25,
@@ -219,6 +221,10 @@ function BitPlayrVideo() {
             setAdTime(data.remainingTime);
           }
         });
+
+        bitPlayrRef.current.on('error', (data) => {
+          console.error(data);
+        });
       } catch (error) {
         console.error('Player initialization error:', error);
       } finally {
@@ -253,10 +259,6 @@ function BitPlayrVideo() {
       switch (direction) {
         case 'ArrowLeft':
           if (focusedButton === 'playPause') {
-            // Custom functionality for rewind when focused on play/pause
-            //handleRewind();
-            console.log('handleRewind');
-
             if (bitPlayrRef.current) {
               bitPlayrRef.current.pause();
               setIsPlaying(false);
@@ -332,28 +334,34 @@ function BitPlayrVideo() {
     }
   };
 
+  const handleArrowKeys = (key: string) => {
+    const arrowKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    if (arrowKeys.includes(key)) {
+      changeFocus(key);
+    }
+  };
+
+  const handleTizenKeys = (keyCode: number) => {
+    const tizenKeyActions = {
+      [tizen.tvinputdevice.getKey('MediaPlay').code]: togglePlayPause,
+      [tizen.tvinputdevice.getKey('MediaPause').code]: togglePlayPause,
+      // MediaStop, MediaFastForward, MediaRewind
+    };
+
+    const action = tizenKeyActions[keyCode];
+    if (action) action();
+  };
+
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        changeFocus(event.key);
-      } else if (event.key === 'Enter') {
+      handleArrowKeys(event.key);
+
+      if (event.key === 'Enter') {
         executeFocusedAction();
       }
+
       if (typeof tizen !== 'undefined') {
-        switch (event.keyCode) {
-          case tizen.tvinputdevice.getKey('MediaPlay').code:
-            togglePlayPause();
-            break;
-          case tizen.tvinputdevice.getKey('MediaPause').code:
-            togglePlayPause();
-            break;
-          case tizen.tvinputdevice.getKey('MediaStop').code:
-            break;
-          case tizen.tvinputdevice.getKey('MediaFastForward').code:
-            break;
-          case tizen.tvinputdevice.getKey('MediaRewind').code:
-            break;
-        }
+        handleTizenKeys(event.keyCode);
       }
     },
     [changeFocus, executeFocusedAction],
@@ -389,7 +397,7 @@ function BitPlayrVideo() {
             console.error('Error trying to play the media:', error);
           });
       }
-      setIsPlaying(!isPlaying); // Toggle the playing state
+      setIsPlaying(!isPlaying);
     }
   };
 
@@ -451,7 +459,7 @@ function BitPlayrVideo() {
 
         setMainThumbnail(mainThumbnailData);
         setSideThumbnails(sideThumbnailsData);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(error.message);
       }
     }

@@ -1,4 +1,4 @@
-import { IMediatailorConfig } from '../interfaces/IMediatailor';
+import { IMediatailorConfig } from '../interfaces/mediatailor';
 
 export class MediaTailorConfig {
   private static config: IMediatailorConfig;

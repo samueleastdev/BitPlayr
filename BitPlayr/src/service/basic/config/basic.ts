@@ -1,4 +1,4 @@
-import { IBasicConfig } from '../interfaces/IBasic';
+import { IBasicConfig } from '../interfaces/basic';
 
 export class BasicConfig {
   private static config: IBasicConfig;

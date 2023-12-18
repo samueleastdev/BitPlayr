@@ -1,4 +1,4 @@
-import { IService } from '../interfaces/ICommon';
+import { IService } from '../interfaces/common';
 import { MediaTailorConfig } from './config/mediatailor';
 
 export class MediatailorService implements IService {

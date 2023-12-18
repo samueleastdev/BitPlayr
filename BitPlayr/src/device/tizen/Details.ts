@@ -1,12 +1,12 @@
-import { IDeviceDetailsProvider, IDeviceDetailsSpec } from '../common/ICommon';
-import { TizenWindow } from './interfaces/ICommon';
+import { IDeviceDetailsProvider, IDeviceDetailsSpec } from '../common/common';
+import { TizenWindow } from './interfaces/common';
 
 export class TizenDetails implements IDeviceDetailsProvider {
   constructor(private context: TizenWindow) {
     this.context = context;
   }
 
-  getDeviceDetails(): Promise<IDeviceDetailsSpec> {
+  getDeviceApi(): Promise<IDeviceDetailsSpec> {
     const details: IDeviceDetailsSpec = {
       manufacturer: 'Laptop Manufacturer',
       model: 'Laptop Model',

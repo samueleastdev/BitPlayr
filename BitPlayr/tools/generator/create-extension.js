@@ -5,15 +5,19 @@ import fs from 'fs-extra';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-// Function to validate the extension name
-function validateAndFormatExtensionName(input) {
-  if (!input.endsWith('Extension')) {
-    return 'The extension name must end with "Extension".';
-  }
-  if (!/^[A-Z][A-Za-z]*Extension$/.test(input)) {
-    return 'The extension name must be in CamelCase and end with "Extension".';
+function validateExtensionName(input) {
+  if (!input.match(/^[a-z]+(-[a-z]+)*$/)) {
+    return 'The extension name must be in kebab-case.';
   }
   return true;
+}
+
+function toPascalCase(str) {
+  return str.replace(/(^\w|-\w)/g, clearAndUpper);
+}
+
+function clearAndUpper(text) {
+  return text.replace(/-/, "").toUpperCase();
 }
 
 function getDirname(url) {
@@ -25,50 +29,58 @@ async function createExtension() {
     {
       type: 'input',
       name: 'name',
-      message: 'Enter the name of the extension:',
-      validate: validateAndFormatExtensionName,
+      message: 'Enter the name of the extension (in kebab-case):',
+      validate: validateExtensionName,
     }
   ]);
 
-  const extensionName = answers.name;
-  const formattedName = extensionName.charAt(0).toLowerCase() + extensionName.slice(1, -9);
-  const interfaceName = `I${extensionName.slice(0, -9)}`;
+  const folderName = answers.name;
+  const className = `${toPascalCase(folderName)}Extension`;
+  const interfaceName = `I${toPascalCase(folderName)}`;
 
   const __dirname = getDirname(import.meta.url);
-  const targetDir = path.join(__dirname, '../../src/extensions', formattedName);
+  const targetDir = path.join(__dirname, '../../src/extensions', folderName);
   const interfacesDir = path.join(targetDir, 'interfaces');
 
-  // Create directories
   fs.ensureDirSync(targetDir);
   fs.ensureDirSync(interfacesDir);
 
-  // Create main class file
-  const mainClassContent = `import { Player } from '../../core/basePlayer';\n` +
-    `import { TimeUpdateEvent } from '../../players/interfaces/IPlayers';\n` +
-    `import { IPlayerExtension } from '../interfaces/ICommon';\n\n` +
-    `export class ${extensionName} implements IPlayerExtension {\n` +
-    `  apply(player: Player) {\n` +
+  const mainClassContent = `import { BasePlayer } from '../../player/base/base-player';\n` +
+    `import { TimeUpdateEvent } from '../../player/common/common';\n` +
+    `import { IPlayerExtension } from '../interfaces/common';\n\n` +
+    `export class ${className} implements IPlayerExtension {\n` +
+    `  apply(player: BasePlayer) {\n` +
     `    player.on('timeupdate', this.handleTimeUpdate);\n` +
     `  }\n\n` +
     `  handleTimeUpdate(event: TimeUpdateEvent) {\n` +
-    `    console.log(event);\n` +
+    `    console.log('${className}: ', event);\n` +
     `  }\n` +
     `}`;
-  fs.writeFileSync(path.join(targetDir, `${formattedName}.ts`), mainClassContent);
+  fs.writeFileSync(path.join(targetDir, `${folderName}.ts`), mainClassContent);
 
-  // Create interface file
   const interfaceContent = `export interface ${interfaceName} {\n\n}`;
   fs.writeFileSync(path.join(interfacesDir, `${interfaceName}.ts`), interfaceContent);
 
-  // Create README.md file
-  const readmeContent = `# ${extensionName}\n\n` +
+  const readmeContent = `# ${className}\n\n` +
+    `## Using Extension\n` +
+    `To use this extension make sure you add it to the extensions array in the playerConfig options.\n\n` +
+    `\`\`\`\n` +
+    `const playerConfig = {\n` +
+    `  extensions: [new ${className}()],\n` +
+    `};\n\n` +
+    `bitPlayrRef.current = await BitPlayr.createPlayer(videoElementId, playerConfig, device);\n` +
+    `\`\`\`\n\n` +
+    `You will also need to export it via index.ts to make it available via the bitplayr api.\n` +
+    `\`\`\`\n` +
+    `export { ${className} } from './extensions/${folderName}/${folderName}';\n` +
+    `\`\`\`\n\n` +
     `## Description\n` +
-    `This is the ${extensionName} extension.\n\n` +
+    `This is the ${className} extension.\n\n` +
     `## API Documentation\n` +
-    `Detailed API documentation for ${extensionName}.\n`;
+    `Detailed API documentation for ${className}.\n`;
   fs.writeFileSync(path.join(targetDir, `README.md`), readmeContent);
 
-  console.log(`${extensionName} extension generated successfully.`);
+  console.log(`${className} extension generated successfully.`);
 }
 
 createExtension();

@@ -1,4 +1,4 @@
-import { IService } from '../interfaces/ICommon';
+import { IService } from '../interfaces/common';
 import { BasicConfig } from './config/basic';
 
 // BasicService implementation

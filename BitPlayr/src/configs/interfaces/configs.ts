@@ -1,4 +1,4 @@
-import { IPlayerExtension } from '../../extensions/interfaces/ICommon';
+import { IPlayerExtension } from '../../extensions/interfaces/common';
 import { LogLevel } from '../../logger/logger';
 
 export interface ISdkConfig {

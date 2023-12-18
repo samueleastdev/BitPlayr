@@ -1,12 +1,12 @@
-import { EDeviceType } from '../DeviceType';
-import { Device } from '../base/DeviceBase';
-import { BrowserDetails } from '../browser/Details';
-import { BrowserDevice } from '../browser/Device';
-import { BrowserInputs } from '../browser/Inputs';
-import { TizenDetails } from '../tizen/Details';
-import { TizenDevice } from '../tizen/Device';
-import { TizenInputs } from '../tizen/Inputs';
-import { TizenWindow } from '../tizen/interfaces/ICommon';
+import { EDeviceType } from '../device-type';
+import { Device } from '../base/device-base';
+import { BrowserDetails } from '../browser/details';
+import { BrowserDevice } from '../browser/device';
+import { BrowserInputs } from '../browser/inputs';
+import { TizenDetails } from '../tizen/details';
+import { TizenDevice } from '../tizen/device';
+import { TizenInputs } from '../tizen/inputs';
+import { TizenWindow } from '../tizen/interfaces/common';
 
 export class DeviceFactory {
   static createDevice(type: string, context: Window): Device {

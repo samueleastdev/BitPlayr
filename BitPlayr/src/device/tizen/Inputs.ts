@@ -1,5 +1,5 @@
-import { IDeviceInputProvider, IDeviceInputSpec } from '../common/ICommon';
-import { TizenWindow } from './interfaces/ICommon';
+import { IDeviceInputProvider, IDeviceInputSpec } from '../common/common';
+import { TizenWindow } from './interfaces/common';
 
 const TizenKeys: Array<string> = [
   'MediaPause',

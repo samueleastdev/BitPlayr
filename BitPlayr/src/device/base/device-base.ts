@@ -4,8 +4,8 @@ import {
   IDeviceDetailsSpec,
   IDeviceInputProvider,
   IDeviceInputSpec,
-} from '../common/ICommon';
-import { IBrowserInfo } from '../interfaces/IUaParser';
+} from '../common/common';
+import { IBrowserInfo } from '../interfaces/uaparser';
 
 export abstract class Device {
   protected parser;
@@ -21,8 +21,8 @@ export abstract class Device {
     return this.inputs.setupInputs();
   }
 
-  getDeviceDetails(): Promise<IDeviceDetailsSpec> {
-    return this.details.getDeviceDetails();
+  getDeviceApi(): Promise<IDeviceDetailsSpec> {
+    return this.details.getDeviceApi();
   }
 
   getInfo(): IBrowserInfo {

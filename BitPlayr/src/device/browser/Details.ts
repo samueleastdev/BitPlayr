@@ -1,11 +1,11 @@
-import { IDeviceDetailsProvider, IDeviceDetailsSpec } from '../common/ICommon';
+import { IDeviceDetailsProvider, IDeviceDetailsSpec } from '../common/common';
 
 export class BrowserDetails implements IDeviceDetailsProvider {
   constructor(private context: Window) {
     this.context = context;
   }
 
-  getDeviceDetails(): Promise<IDeviceDetailsSpec> {
+  getDeviceApi(): Promise<IDeviceDetailsSpec> {
     const details: IDeviceDetailsSpec = {
       manufacturer: 'Laptop Manufacturer',
       model: 'Laptop Model',

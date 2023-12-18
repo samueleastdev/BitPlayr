@@ -1,12 +1,12 @@
-import { SdkConfig } from './configs/sdkConfig';
-import { IService, IVideoService } from './service/interfaces/ICommon';
-import { DeviceFactory } from './device/factory/DeviceFactory';
-import { IDeviceDetails } from './device/common/ICommon';
-import { DeviceType } from './device/DeviceType';
-import { PlayerFactory } from './player/factory/PlayerFactory';
-import { BasePlayer } from './player/base/BasePlayer';
-import { IPlayerExtension } from './extensions/interfaces/ICommon';
-import { IGlobalConfig } from './configs/interfaces/IConfigs';
+import { SdkConfig } from './configs/sdk-config';
+import { IService, IVideoService } from './service/interfaces/common';
+import { DeviceFactory } from './device/factory/device-factory';
+import { IDeviceDetails } from './device/common/common';
+import { DeviceType } from './device/device-type';
+import { PlayerFactory } from './player/factory/player-factory';
+import { BasePlayer } from './player/base/base-player';
+import { IPlayerExtension } from './extensions/interfaces/common';
+import { IGlobalConfig } from './configs/interfaces/configs';
 
 export class BitPlayr {
   static async initialiseDevice(): Promise<IDeviceDetails | undefined> {
@@ -14,22 +14,17 @@ export class BitPlayr {
 
     try {
       const deviceType = new DeviceType();
-
       const device = DeviceFactory.createDevice(deviceType.device(), context);
-
-      const details = await device.getDeviceDetails();
-
+      const details = await device.getDeviceApi();
       const inputs = await device.setupInputs();
-
       const ua = await device.getInfo();
 
       const result: IDeviceDetails = {
-        type: 'HLS',
+        deviceType: deviceType.device(),
         inputs,
         details,
         ua,
       };
-      console.log('details', result);
 
       return result;
     } catch (error) {

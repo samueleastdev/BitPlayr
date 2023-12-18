@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
 import { LogLevel, SDKLogger } from '../../logger/logger';
-import { IDeviceDetails } from '../../device/common/ICommon';
-import { IPlayerConfig } from '../../configs/interfaces/IConfigs';
-import { IQualityLevel, ITrack } from '../interfaces/ITracks';
-import { IVideoService } from '../../service/interfaces/ICommon';
+import { IDeviceDetails } from '../../device/common/common';
+import { IPlayerConfig } from '../../configs/interfaces/configs';
+import { IQualityLevel, ITrack } from '../interfaces/tracks';
+import { IVideoService } from '../../service/interfaces/common';
 
 export abstract class BasePlayer extends EventEmitter {
   protected logger: SDKLogger;
@@ -52,10 +52,12 @@ export abstract class BasePlayer extends EventEmitter {
   }
 
   fullscreen(): void {
+    this.emit('fullscreen');
     this.videoElement.requestFullscreen();
   }
 
   seekTo(time: number): void {
+    this.emit('seekTo', time);
     if (typeof this.videoElement.fastSeek === 'function') {
       this.videoElement.fastSeek(time);
     } else {

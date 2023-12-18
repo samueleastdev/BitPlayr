@@ -1,10 +1,11 @@
 import shaka from 'shaka-player';
-import { BasePlayer } from '../base/BasePlayer';
-import { IDeviceDetails } from '../../device/common/ICommon';
-import { IPlayerConfig } from '../../configs/interfaces/IConfigs';
+import { BasePlayer } from '../base/base-player';
+import { IDeviceDetails } from '../../device/common/common';
+import { IPlayerConfig } from '../../configs/interfaces/configs';
 import { WithTelemetry } from '../../telementry/decorators';
-import { IQualityLevel, ITrack } from '../interfaces/ITracks';
-import { IVideoService } from '../../service/interfaces/ICommon';
+import { IQualityLevel, ITrack } from '../interfaces/tracks';
+import { IVideoService } from '../../service/interfaces/common';
+import { VideoEvents } from '../common/common';
 
 export class ShakaPlayer extends BasePlayer {
   private player!: shaka.Player;
@@ -33,8 +34,11 @@ export class ShakaPlayer extends BasePlayer {
 
     this.player.configure(this.playerConfig);
     this.logger.info(`Shaka PlayerConfig:`, this.playerConfig);
-    this.videoElement.addEventListener('loadedmetadata', this.emit.bind(this, 'loadedmetadata'));
-    this.videoElement.addEventListener('timeupdate', this.emit.bind(this, 'timeupdate'));
+
+    Object.values(VideoEvents).forEach((event: VideoEvents) => {
+      this.videoElement.addEventListener(event, this.emit.bind(this, event));
+    });
+
     this.player.addEventListener('loaded', this.getQualityLevels.bind(this));
     this.player.addEventListener('loaded', this.getTracks.bind(this));
   }
@@ -43,11 +47,14 @@ export class ShakaPlayer extends BasePlayer {
   load(provider: IVideoService): void {
     this.player
       .load(provider.manifestUrl, this.playerConfig.global.startTime)
-      .then(function () {
-        console.log('The video has been loaded successfully!');
+      .then(() => {
+        this.logger.info('The video has been loaded successfully!');
       })
-      .catch(() => {
-        console.log('ERROR');
+      .catch((e) => {
+        this.emit('error', {
+          type: 'Player',
+          message: JSON.stringify(e),
+        });
       });
   }
 

@@ -1,4 +1,4 @@
-import { IDeviceInputProvider, IDeviceInputSpec } from '../common/ICommon';
+import { IDeviceInputProvider, IDeviceInputSpec } from '../common/common';
 
 export class BrowserInputs implements IDeviceInputProvider {
   constructor(private context: Window) {

@@ -1,4 +1,5 @@
-import { IBrowserInfo } from '../interfaces/IUaParser';
+import { EDeviceType } from '../device-type';
+import { IBrowserInfo } from '../interfaces/uaparser';
 
 export interface IDeviceInputSpec {
   inputType: string;
@@ -15,11 +16,11 @@ export interface IDeviceDetailsSpec {
 }
 
 export interface IDeviceDetailsProvider {
-  getDeviceDetails(): Promise<IDeviceDetailsSpec>;
+  getDeviceApi(): Promise<IDeviceDetailsSpec>;
 }
 
 export interface IDeviceDetails {
-  type: string;
+  deviceType: EDeviceType;
   inputs: IDeviceInputSpec;
   details: IDeviceDetailsSpec;
   ua: IBrowserInfo;

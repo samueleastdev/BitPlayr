@@ -1,5 +1,5 @@
-import { BasePlayer } from '../../player/base/BasePlayer';
-import { IPlayerExtension } from '../interfaces/ICommon';
+import { BasePlayer } from '../../player/base/base-player';
+import { IPlayerExtension } from '../interfaces/common';
 
 export class ThumbnailsExtension implements IPlayerExtension {
   apply(player: BasePlayer) {
