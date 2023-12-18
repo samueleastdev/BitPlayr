@@ -1,4 +1,4 @@
-import Hls, { MediaPlaylist } from 'hls.js';
+import Hls, { ErrorData, Events, MediaPlaylist } from 'hls.js';
 import { BasePlayer } from '../base/base-player';
 import { IDeviceDetails } from '../../device/common/common';
 import { IPlayerConfig } from '../../configs/interfaces/configs';
@@ -23,32 +23,51 @@ export class HlsPlayer extends BasePlayer {
 
   @WithTelemetry
   protected initialize(): void {
-    this.logger.info(`Initializing HLS Player: ${this.videoElement}`);
-
-    if (!this.videoElement) {
-      this.logger.error(`Element with ID '${this.videoElement}' not found.`);
-      throw new Error(`Element with ID '${this.videoElement}' not found.`);
-    }
+    this.validateVideoElement();
 
     if (Hls.isSupported()) {
       this.player = new Hls(this.playerConfig.hls);
       this.logger.info(`HLS PlayerConfig:`, this.playerConfig.hls);
       this.player.attachMedia(this.videoElement);
-
-      Object.values(VideoEvents).forEach((event: VideoEvents) => {
-        this.videoElement.addEventListener(event, this.emit.bind(this, event));
-      });
-
-      this.player.on(Hls.Events.MANIFEST_LOADED, this.getQualityLevels.bind(this));
-      this.player.on(Hls.Events.LEVEL_LOADED, this.getTracks.bind(this));
+      this.registerPlayerEvents();
     } else {
       this.logger.error('HLS is not supported');
     }
   }
 
+  private validateVideoElement() {
+    if (!this.videoElement) {
+      const errorMsg = `Element with ID '${this.videoElement}' not found.`;
+      this.logger.error(errorMsg);
+      throw new Error(errorMsg);
+    }
+  }
+
+  private registerPlayerEvents() {
+    Object.values(VideoEvents).forEach((event: VideoEvents) => {
+      this.videoElement.addEventListener(event, this.emit.bind(this, event));
+    });
+
+    this.player.on(Hls.Events.MANIFEST_LOADED, this.getQualityLevels.bind(this));
+    this.player.on(Hls.Events.LEVEL_LOADED, this.getTracks.bind(this));
+    this.player.on(Hls.Events.ERROR, this.handleError.bind(this));
+  }
+
   @WithTelemetry
   load(provider: IVideoService): void {
     this.player.loadSource(provider.manifestUrl);
+  }
+
+  handleError(event: Events.ERROR, data: ErrorData) {
+    let type = 'Player';
+    if (data.fatal && data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+      type = 'DRM';
+    }
+
+    this.emit('error', {
+      type: type,
+      message: JSON.stringify(data),
+    });
   }
 
   collectStats() {

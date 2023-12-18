@@ -100,11 +100,33 @@ function BitPlayrVideo() {
                 limitBitrateByPortal: false,
               },
             },
+            drm: {
+              'com.widevine.alpha': {
+                serverURL: 'YOUR_WIDEVINE_LICENSE_SERVER_URL',
+              },
+              'com.microsoft.playready': {
+                serverURL: 'YOUR_PLAYREADY_LICENSE_SERVER_URL',
+              },
+            },
           },
           hls: {
-            autoplay: true,
+            drmSystemOptions: {
+              widevine: {
+                licenseUrl: 'YOUR_WIDEVINE_LICENSE_SERVER_URL',
+              },
+              playready: {
+                licenseUrl: 'YOUR_PLAYREADY_LICENSE_SERVER_URL',
+              },
+            },
           },
           shaka: {
+            drm: {
+              servers: {
+                'com.widevine.alpha': 'https://widevine-license-server-url',
+                'com.microsoft.playready': 'https://playready-license-server-url',
+                // Add other DRM systems and their license servers if needed
+              },
+            },
             // Streaming configurations
             streaming: {
               // Sets the rebuffering goal in seconds. The player will buffer this much

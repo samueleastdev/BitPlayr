@@ -1,5 +1,6 @@
 #player-container {
   position: relative;
+  font-family: 'Poppins', sans-serif;
 }
 
 #player-container video {
@@ -109,7 +110,7 @@
 }
 
 .MuiIconButton-root {
-  border-radius: 0% !important;
+  border-radius: 10px !important;
 }
 
 .settings {

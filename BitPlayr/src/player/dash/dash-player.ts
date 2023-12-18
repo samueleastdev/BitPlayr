@@ -21,23 +21,35 @@ export class DashPlayer extends BasePlayer {
 
   @WithTelemetry
   protected initialize(): void {
-    this.logger.info(`Initializing Dash Player: ${this.videoElement}`);
-
-    if (!this.videoElement) {
-      this.logger.error(`Element with ID '${this.videoElement}' not found.`);
-      throw new Error(`Element with ID '${this.videoElement}' not found.`);
-    }
+    this.validateVideoElement();
 
     this.player = dashjs.MediaPlayer().create();
     this.player.updateSettings(this.playerConfig.dash);
     this.logger.info(`DASH PlayerConfig:`, this.playerConfig.dash);
 
+    if (this.playerConfig.dash.drm) {
+      this.player.setProtectionData(this.playerConfig.dash.drm);
+    }
+
+    this.registerPlayerEvents();
+  }
+
+  private validateVideoElement() {
+    if (!this.videoElement) {
+      const errorMsg = `Element with ID '${this.videoElement}' not found.`;
+      this.logger.error(errorMsg);
+      throw new Error(errorMsg);
+    }
+  }
+
+  private registerPlayerEvents() {
     Object.values(VideoEvents).forEach((event: VideoEvents) => {
       this.videoElement.addEventListener(event, this.emit.bind(this, event));
     });
 
     this.player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, this.getQualityLevels.bind(this));
     this.player.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, this.getTracks.bind(this));
+    this.player.on(dashjs.MediaPlayer.events.ERROR, this.handleError.bind(this));
   }
 
   @WithTelemetry
@@ -47,6 +59,17 @@ export class DashPlayer extends BasePlayer {
     if (ttmlDiv) {
       this.player.attachTTMLRenderingDiv(ttmlDiv);
     }
+  }
+
+  handleError(e: dashjs.ErrorEvent): void {
+    let type = 'Player';
+    if (e.error === 'capability' && e.event === 'mediasource') {
+      type = 'DRM';
+    }
+    this.emit('error', {
+      type: type,
+      message: JSON.stringify(e),
+    });
   }
 
   collectStats() {

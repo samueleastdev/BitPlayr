@@ -21,12 +21,7 @@ export class ShakaPlayer extends BasePlayer {
 
   @WithTelemetry
   protected async initialize(): Promise<void> {
-    this.logger.info(`Initializing Shaka Player: ${this.videoElement}`);
-
-    if (!this.videoElement) {
-      this.logger.error(`Element with ID '${this.videoElement}' not found.`);
-      throw new Error(`Element with ID '${this.videoElement}' not found.`);
-    }
+    this.validateVideoElement();
 
     shaka.polyfill.installAll();
     this.player = new shaka.Player();
@@ -35,12 +30,25 @@ export class ShakaPlayer extends BasePlayer {
     this.player.configure(this.playerConfig);
     this.logger.info(`Shaka PlayerConfig:`, this.playerConfig);
 
-    Object.values(VideoEvents).forEach((event: VideoEvents) => {
-      this.videoElement.addEventListener(event, this.emit.bind(this, event));
-    });
+    this.registerPlayerEvents();
+  }
+
+  private validateVideoElement() {
+    if (!this.videoElement) {
+      const errorMsg = `Element with ID '${this.videoElement}' not found.`;
+      this.logger.error(errorMsg);
+      throw new Error(errorMsg);
+    }
+  }
+
+  private registerPlayerEvents() {
+    Object.values(VideoEvents).forEach((event) =>
+      this.videoElement.addEventListener(event, this.emit.bind(this, event)),
+    );
 
     this.player.addEventListener('loaded', this.getQualityLevels.bind(this));
     this.player.addEventListener('loaded', this.getTracks.bind(this));
+    this.player.addEventListener('error', this.handleError.bind(this));
   }
 
   @WithTelemetry
@@ -56,6 +64,21 @@ export class ShakaPlayer extends BasePlayer {
           message: JSON.stringify(e),
         });
       });
+  }
+
+  handleError(event: Event) {
+    const error = event as unknown as { detail: shaka.util.Error };
+
+    let type = 'Player';
+
+    if (error.detail && error.detail.category === shaka.util.Error.Category.DRM) {
+      type = 'DRM';
+    }
+
+    this.emit('error', {
+      type: type,
+      message: JSON.stringify(error.detail),
+    });
   }
 
   collectStats() {
